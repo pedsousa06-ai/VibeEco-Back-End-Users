@@ -15,7 +15,7 @@ paths:
   # ==========================================
   # Gerenciamento de Usuários
   # ==========================================
-  /v1/vibeEco/administrador/usuarios:
+  /v1/techProton/vibeEco/usuarios:
     get:
       tags:
         - Usuários
@@ -35,7 +35,7 @@ paths:
         '500':
           description: Erro interno no servidor.
 
-  /v1/vibeEco/administrador/usuarios/{id}:
+  /v1/techProton/vibeEco/usuarios/{id}:
     get:
       tags:
         - Usuários
@@ -95,7 +95,7 @@ paths:
   # ==========================================
   # Gerenciamento de Missões
   # ==========================================
-  /v1/vibeEco/administrador/missoes:
+  /v1/techProton/vibeEco/missoes:
     get:
       tags:
         - Missões
@@ -115,7 +115,7 @@ paths:
         '500':
           description: Erro interno no servidor.
 
-  /v1/vibeEco/administrador/missoes/{id}:
+  /v1/techProton/vibeEco/missoes/{id}:
     get:
       tags:
         - Missões
@@ -175,7 +175,7 @@ paths:
   # ==========================================
   # Gerenciamento de Desafios
   # ==========================================
-  /v1/vibeEco/administrador/desafios:
+  /v1/techProton/vibeEco/desafios:
     get:
       tags:
         - Desafios
@@ -195,7 +195,7 @@ paths:
         '500':
           description: Erro interno no servidor.
 
-  /v1/vibeEco/administrador/desafios/{id}:
+  /v1/techProton/vibeEco/desafios/{id}:
     get:
       tags:
         - Desafios
@@ -255,7 +255,7 @@ paths:
   # ==========================================
   # Gerenciamento de Conteúdos Educativos
   # ==========================================
-  /v1/vibeEco/administrador/educativos:
+  /v1/techProton/vibeEco/educativos:
     get:
       tags:
         - Educativos
@@ -275,7 +275,7 @@ paths:
         '500':
           description: Erro interno no servidor.
 
-  /v1/vibeEco/administrador/educativos/{id}:
+  /v1/techProton/vibeEco/educativos/{id}:
     get:
       tags:
         - Educativos
@@ -329,7 +329,7 @@ paths:
   # ==========================================
   # Gerenciamento de Premiações
   # ==========================================
-  /v1/vibeEco/administrador/premiacao:
+  /v1/techProton/vibeEco/premiacao:
     get:
       tags:
         - Premiações
@@ -349,7 +349,7 @@ paths:
         '500':
           description: Erro interno no servidor.
 
-  /v1/vibeEco/administrador/premiacao/{id}:
+  /v1/techProton/vibeEco/premiacao/{id}:
     get:
       tags:
         - Premiações
@@ -403,7 +403,7 @@ paths:
   # ==========================================
   # Gerenciamento de Conquistas
   # ==========================================
-  /v1/vibeEco/administrador/conquistas:
+  /v1/techProton/vibeEco/conquistas:
     get:
       tags:
         - Conquistas
@@ -423,7 +423,7 @@ paths:
         '500':
           description: Erro interno no servidor.
 
-  /v1/vibeEco/administrador/conquistas/{id}:
+  /v1/techProton/vibeEco/conquistas/{id}:
     get:
       tags:
         - Conquistas
@@ -477,7 +477,7 @@ paths:
   # ==========================================
   # Gerenciamento de Recompensas
   # ==========================================
-  /v1/vibeEco/administrador/recompensas:
+  /v1/techProton/vibeEco/recompensas:
     get:
       tags:
         - Recompensas
@@ -497,7 +497,7 @@ paths:
         '500':
           description: Erro interno no servidor.
 
-  /v1/vibeEco/administrador/recompensas/{id}:
+  /v1/techProton/vibeEco/recompensas/{id}:
     get:
       tags:
         - Recompensas
