@@ -1,0 +1,1087 @@
+openapi: 3.0.3
+info:
+  title: VibeEco ADM - TechProton API
+  description: API centralizada para a gestão administrativa, controle de dados e governança da plataforma VibeEco.
+  termsOfService: http://swagger.io/terms/
+  version: 1.0.26
+externalDocs:
+  description: Documentação oficial do Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:8080
+    description: Servidor de Desenvolvimento
+paths:
+
+  # ==========================================
+  # Gerenciamento de Usuários
+  # ==========================================
+  /v1/vibeEco/administrador/usuarios:
+    get:
+      tags:
+        - Usuários
+      summary: Listar usuários
+      description: Retorna uma lista com todos os usuários cadastrados no sistema.
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuarios'          
+        '404':
+          description: Nenhum usuário encontrado.
+        '500':
+          description: Erro interno no servidor.
+
+  /v1/vibeEco/administrador/usuarios/{id}:
+    get:
+      tags:
+        - Usuários
+      summary: Buscar usuário por ID
+      description: Retorna os detalhes de um usuário específico com base no identificador único fornecido.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) do usuário.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuarios'          
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Usuário não encontrado.
+        '500':
+          description: Erro interno no servidor.
+
+  # ==========================================
+  # Gerenciamento de Missões
+  # ==========================================
+  /v1/vibeEco/administrador/missoes:
+    get:
+      tags:
+        - Missões
+      summary: Listar missões
+      description: Retorna uma listagem de todas as missões cadastradas no sistema.
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Missoes'          
+        '404':
+          description: Nenhuma missão encontrada.
+        '500':
+          description: Erro interno no servidor.
+
+  /v1/vibeEco/administrador/missoes/{id}:
+    get:
+      tags:
+        - Missões
+      summary: Buscar missão por ID
+      description: Retorna os detalhes de uma missão específica através do ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) da missão.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Missoes'          
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Missão não encontrada.
+        '500':
+          description: Erro interno no servidor.
+    put:
+      tags:
+        - Missões
+      summary: Atualizar missão por ID
+      description: Atualiza as informações de uma missão existente com base no seu ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) da missão a ser atualizada.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Dados atualizados da missão.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Missoes'
+        required: true
+      responses:
+        '200':
+          description: Missão atualizada com sucesso.
+        '400':
+          description: ID fornecido ou dados da requisição são inválidos.
+        '404':
+          description: Missão não encontrada.
+        '500':
+          description: Erro interno no servidor.
+    delete:
+      tags:
+        - Missões
+      summary: Excluir missão por ID
+      description: Remove uma missão do sistema utilizando seu ID como referência.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) da missão a ser excluída.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Missão excluída com sucesso.
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Missão não encontrada.
+        '500':
+          description: Erro interno no servidor.
+
+  # ==========================================
+  # Gerenciamento de Desafios
+  # ==========================================
+  /v1/vibeEco/administrador/desafios:
+    post:
+      tags:
+        - Desafios
+      summary: Cadastrar novo desafio
+      description: Registra um novo desafio ecológico na plataforma.
+      requestBody:
+        description: Objeto contendo os dados necessários para o cadastro do desafio.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Desafios'
+        required: true
+      responses:
+        '201':
+          description: Desafio criado com sucesso.
+        '400':
+          description: Requisição inválida.
+        '500':
+          description: Erro interno no servidor.
+    get:
+      tags:
+        - Desafios
+      summary: Listar desafios
+      description: Retorna uma listagem de todos os desafios cadastrados.
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Desafios'          
+        '404':
+          description: Nenhum desafio encontrado.
+        '500':
+          description: Erro interno no servidor.
+
+  /v1/vibeEco/administrador/desafios/{id}:
+    get:
+      tags:
+        - Desafios
+      summary: Buscar desafio por ID
+      description: Retorna os dados de um desafio específico através do ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) do desafio.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Desafios'          
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Desafio não encontrado.
+        '500':
+          description: Erro interno no servidor.
+    put:
+      tags:
+        - Desafios
+      summary: Atualizar desafio por ID
+      description: Atualiza os dados de um desafio existente utilizando o ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) do desafio a ser atualizado.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Dados atualizados do desafio.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Desafios'
+        required: true
+      responses:
+        '200':
+          description: Desafio atualizado com sucesso.
+        '400':
+          description: ID fornecido ou dados da requisição são inválidos.
+        '404':
+          description: Desafio não encontrado.
+        '500':
+          description: Erro interno no servidor.
+    delete:
+      tags:
+        - Desafios
+      summary: Excluir desafio por ID
+      description: Remove um desafio da base de dados através do ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) do desafio a ser excluído.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Desafio excluído com sucesso.
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Desafio não encontrado.
+        '500':
+          description: Erro interno no servidor.
+
+  # ==========================================
+  # Gerenciamento de Conteúdos Educativos
+  # ==========================================
+  /v1/vibeEco/administrador/educativos:
+    post:
+      tags:
+        - Educativos
+      summary: Cadastrar conteúdo educativo
+      description: Registra um novo material ou conteúdo educativo no sistema.
+      requestBody:
+        description: Objeto contendo os dados necessários para o cadastro do conteúdo.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Educativos'
+        required: true
+      responses:
+        '201':
+          description: Conteúdo educativo criado com sucesso.
+        '400':
+          description: Requisição inválida.
+        '500':
+          description: Erro interno no servidor.
+    get:
+      tags:
+        - Educativos
+      summary: Listar conteúdos educativos
+      description: Retorna uma listagem de todos os conteúdos educativos cadastrados.
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Educativos'          
+        '404':
+          description: Nenhum conteúdo encontrado.
+        '500':
+          description: Erro interno no servidor.
+
+  /v1/vibeEco/administrador/educativos/{id}:
+    get:
+      tags:
+        - Educativos
+      summary: Buscar conteúdo educativo por ID
+      description: Retorna as informações de um conteúdo específico através do ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) do conteúdo educativo.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Educativos'          
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Conteúdo educativo não encontrado.
+        '500':
+          description: Erro interno no servidor.
+    put:
+      tags:
+        - Educativos
+      summary: Atualizar conteúdo educativo por ID
+      description: Atualiza os dados de um conteúdo educativo utilizando seu ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) do conteúdo a ser atualizado.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Dados atualizados do conteúdo educativo.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Educativos'
+        required: true
+      responses:
+        '200':
+          description: Conteúdo educativo atualizado com sucesso.
+        '400':
+          description: ID fornecido ou dados da requisição são inválidos.
+        '404':
+          description: Conteúdo educativo não encontrado.
+        '500':
+          description: Erro interno no servidor.
+    delete:
+      tags:
+        - Educativos
+      summary: Excluir conteúdo educativo por ID
+      description: Remove um conteúdo educativo da base de dados através do ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) do conteúdo a ser excluído.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Conteúdo educativo excluído com sucesso.
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Conteúdo educativo não encontrado.
+        '500':
+          description: Erro interno no servidor.
+
+  # ==========================================
+  # Gerenciamento de Premiações
+  # ==========================================
+  /v1/vibeEco/administrador/premiacao:
+    post:
+      tags:
+        - Premiações
+      summary: Cadastrar nova premiação
+      description: Registra uma nova premiação a ser distribuída no sistema.
+      requestBody:
+        description: Objeto contendo os dados necessários para o cadastro da premiação.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Premiacao'
+        required: true
+      responses:
+        '201':
+          description: Premiação criada com sucesso.
+        '400':
+          description: Requisição inválida.
+        '500':
+          description: Erro interno no servidor.
+    get:
+      tags:
+        - Premiações
+      summary: Listar premiações
+      description: Retorna uma listagem de todas as premiações cadastradas.
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Premiacao'          
+        '404':
+          description: Nenhuma premiação encontrada.
+        '500':
+          description: Erro interno no servidor.
+
+  /v1/vibeEco/administrador/premiacao/{id}:
+    get:
+      tags:
+        - Premiações
+      summary: Buscar premiação por ID
+      description: Retorna os detalhes de uma premiação específica através do ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) da premiação.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Premiacao'          
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Premiação não encontrada.
+        '500':
+          description: Erro interno no servidor.
+    put:
+      tags:
+        - Premiações
+      summary: Atualizar premiação por ID
+      description: Atualiza os dados de uma premiação existente utilizando o ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) da premiação a ser atualizada.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Dados atualizados da premiação.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Premiacao'
+        required: true
+      responses:
+        '200':
+          description: Premiação atualizada com sucesso.
+        '400':
+          description: ID fornecido ou dados da requisição são inválidos.
+        '404':
+          description: Premiação não encontrada.
+        '500':
+          description: Erro interno no servidor.
+    delete:
+      tags:
+        - Premiações
+      summary: Excluir premiação por ID
+      description: Remove uma premiação da base de dados através do ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) da premiação a ser excluída.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Premiação excluída com sucesso.
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Premiação não encontrada.
+        '500':
+          description: Erro interno no servidor.
+
+  # ==========================================
+  # Gerenciamento de Conquistas
+  # ==========================================
+  /v1/vibeEco/administrador/conquistas:
+    post:
+      tags:
+        - Conquistas
+      summary: Cadastrar nova conquista
+      description: Registra uma nova conquista (badge/achievement) no sistema.
+      requestBody:
+        description: Objeto contendo os dados necessários para o cadastro da conquista.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Conquistas'
+        required: true
+      responses:
+        '201':
+          description: Conquista criada com sucesso.
+        '400':
+          description: Requisição inválida.
+        '500':
+          description: Erro interno no servidor.
+    get:
+      tags:
+        - Conquistas
+      summary: Listar conquistas
+      description: Retorna uma listagem de todas as conquistas cadastradas.
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Conquistas'          
+        '404':
+          description: Nenhuma conquista encontrada.
+        '500':
+          description: Erro interno no servidor.
+
+  /v1/vibeEco/administrador/conquistas/{id}:
+    get:
+      tags:
+        - Conquistas
+      summary: Buscar conquista por ID
+      description: Retorna os detalhes de uma conquista específica através do ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) da conquista.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conquistas'          
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Conquista não encontrada.
+        '500':
+          description: Erro interno no servidor.
+    put:
+      tags:
+        - Conquistas
+      summary: Atualizar conquista por ID
+      description: Atualiza os dados de uma conquista existente utilizando o ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) da conquista a ser atualizada.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Dados atualizados da conquista.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Conquistas'
+        required: true
+      responses:
+        '200':
+          description: Conquista atualizada com sucesso.
+        '400':
+          description: ID fornecido ou dados da requisição são inválidos.
+        '404':
+          description: Conquista não encontrada.
+        '500':
+          description: Erro interno no servidor.
+    delete:
+      tags:
+        - Conquistas
+      summary: Excluir conquista por ID
+      description: Remove uma conquista da base de dados através do ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) da conquista a ser excluída.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Conquista excluída com sucesso.
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Conquista não encontrada.
+        '500':
+          description: Erro interno no servidor.
+
+  # ==========================================
+  # Gerenciamento de Recompensas
+  # ==========================================
+  /v1/vibeEco/administrador/recompensas:
+    post:
+      tags:
+        - Recompensas
+      summary: Cadastrar nova recompensa
+      description: Registra uma nova recompensa no sistema de pontuação/loja.
+      requestBody:
+        description: Objeto contendo os dados necessários para o cadastro da recompensa.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recompensas'
+        required: true
+      responses:
+        '201':
+          description: Recompensa criada com sucesso.
+        '400':
+          description: Requisição inválida.
+        '500':
+          description: Erro interno no servidor.
+    get:
+      tags:
+        - Recompensas
+      summary: Listar recompensas
+      description: Retorna uma listagem de todas as recompensas cadastradas.
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recompensas'          
+        '404':
+          description: Nenhuma recompensa encontrada.
+        '500':
+          description: Erro interno no servidor.
+
+  /v1/vibeEco/administrador/recompensas/{id}:
+    get:
+      tags:
+        - Recompensas
+      summary: Buscar recompensa por ID
+      description: Retorna os detalhes de uma recompensa específica através do ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) da recompensa.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recompensas'          
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Recompensa não encontrada.
+        '500':
+          description: Erro interno no servidor.
+    put:
+      tags:
+        - Recompensas
+      summary: Atualizar recompensa por ID
+      description: Atualiza os dados de uma recompensa existente utilizando o ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) da recompensa a ser atualizada.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Dados atualizados da recompensa.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recompensas'
+        required: true
+      responses:
+        '200':
+          description: Recompensa atualizada com sucesso.
+        '400':
+          description: ID fornecido ou dados da requisição são inválidos.
+        '404':
+          description: Recompensa não encontrada.
+        '500':
+          description: Erro interno no servidor.
+    delete:
+      tags:
+        - Recompensas
+      summary: Excluir recompensa por ID
+      description: Remove uma recompensa da base de dados através do ID.
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único (ID) da recompensa a ser excluída.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Recompensa excluída com sucesso.
+        '400':
+          description: ID fornecido é inválido.
+        '404':
+          description: Recompensa não encontrada.
+        '500':
+          description: Erro interno no servidor.
+
+# ==========================================
+# Componentes e Schemas
+# ==========================================
+components:
+  schemas:
+
+    # Schema de Usuários
+    Usuarios:
+      required:
+        - nome
+        - email
+        - senha
+        - total_xp
+        - coins
+        - id_escolaridade
+        - id_status
+        - id_instituicao
+        - id_nivel_acesso
+        - id_level
+        - id_ultimo_acesso
+        - id_sexo
+      type: object
+      description: Objeto de representação de um usuário na plataforma.
+      properties:
+        id:
+          type: integer
+          description: Identificador único gerado automaticamente para o usuário.
+        nome:
+          type: string
+          description: Nome completo do usuário.
+        email:
+          type: string
+          format: email
+          description: Endereço de e-mail corporativo ou pessoal do usuário.
+        senha:
+          type: string
+          format: password
+          description: Senha de acesso criptografada do usuário.
+        total_xp:
+          type: integer
+          description: Quantidade total de pontos de experiência (XP) acumulados.
+        coins:
+          type: integer
+          description: Saldo de moedas virtuais (VibeCoins) do usuário.
+        id_escolaridade:
+          type: integer
+          description: Chave estrangeira referente ao nível de escolaridade.
+        id_status:
+          type: integer
+          description: Chave estrangeira referente ao status atual da conta (ex. ativo, inativo).
+        id_instituicao:
+          type: array
+          items:
+            type: integer
+          description: Lista de chaves estrangeiras referentes às instituições vinculadas.
+          example: [1, 5, 12]
+        id_nivel_acesso:
+          type: integer
+          description: Chave estrangeira referente ao nível de permissão/acesso do usuário.
+        id_level:
+          type: integer
+          description: Chave estrangeira referente ao nível atual do usuário na gamificação.
+        id_ultimo_acesso:
+          type: integer
+          description: Registro de referência ou timestamp do último acesso realizado.
+        id_sexo:
+          type: integer
+          description: Chave estrangeira referente à identificação de gênero/sexo.
+
+    # Schema de Missões
+    Missoes:
+      required:
+        - nome
+        - descricao
+        - coins
+        - total_xp_missao
+        - data_inicio
+        - data_termino
+        - id_dificuldade
+      type: object
+      description: Objeto de representação de uma missão ecológica.
+      properties:
+        id:
+          type: integer
+          description: Identificador único da missão.
+        nome:
+          type: string
+          description: Título ou nome identificador da missão.
+        descricao:
+          type: string
+          description: Detalhamento completo dos objetivos e regras da missão.
+        coins:
+          type: integer
+          description: Quantidade de moedas concedidas ao concluir a missão.
+        total_xp_missao:
+          type: integer
+          description: Quantidade total de XP concedida ao concluir a missão.
+        data_inicio:
+          type: string
+          format: date
+          description: Data de início da vigência da missão (AAAA-MM-DD).
+        data_termino:
+          type: string
+          format: date
+          description: Data limite para a conclusão da missão (AAAA-MM-DD).
+        id_dificuldade:
+          type: string
+          description: Nível de complexidade ou dificuldade atribuído à missão.
+        
+    # Schema de Desafios
+    Desafios:
+      required:
+        - nome
+        - descricao
+        - id_dificuldade
+      type: object
+      description: Objeto de representação de um desafio ecológico.
+      properties:
+        id:
+          type: integer
+          description: Identificador único do desafio.
+        nome:
+          type: string
+          description: Título ou nome identificador do desafio.
+        descricao:
+          type: string
+          description: Descrição detalhada do desafio proposto.
+        id_dificuldade:
+          type: string
+          description: Nível de complexidade ou dificuldade do desafio.
+
+    # Schema de Conteúdos Educativos
+    Educativos:
+      required:
+        - nome
+        - descricao
+        - id_anexo
+      type: object
+      description: Objeto de representação de um conteúdo educativo/material de apoio.
+      properties:
+        id:
+          type: integer
+          description: Identificador único do conteúdo educativo.
+        nome:
+          type: string
+          description: Título do material ou conteúdo educativo.
+        descricao:
+          type: string
+          description: Resumo descritivo ou texto explicativo do conteúdo.
+        id_anexo:
+          type: array
+          items: 
+            type: integer
+          description: Lista de identificadores dos arquivos anexados ao conteúdo.
+          example: [1, 4, 7]
+
+    # Schema de Administradores
+    Administrador:
+      required:
+        - nome
+        - email
+        - senha
+        - id_nivel_acesso
+      type: object
+      description: Objeto de representação de um administrador do sistema.
+      properties:
+        id:
+          type: integer
+          description: Identificador único do administrador.
+        nome:
+          type: string
+          description: Nome completo do administrador.
+        email:
+          type: string
+          format: email
+          description: E-mail de autenticação do administrador.
+        senha: 
+          type: string
+          format: password
+          description: Senha de acesso do administrador.
+        id_nivel_acesso:
+          type: integer
+          description: Chave estrangeira referente ao nível de permissão administrativa.
+
+    # Schema de Premiações
+    Premiacao:
+      required:
+        - nome
+        - descricao
+        - codigo_rastreio
+        - motivo_premiacao
+      type: object
+      description: Objeto de representação de uma premiação concedida.
+      properties:
+        id:
+          type: integer
+          description: Identificador único da premiação.
+        nome:
+          type: string
+          description: Nome ou título do prêmio concedido.
+        descricao:
+          type: string
+          description: Detalhes adicionais sobre a premiação.
+        codigo_rastreio: 
+          type: string
+          description: Código de rastreamento logístico do envio do prêmio.
+        motivo_premiacao:
+          type: string
+          description: Descrição da justificativa ou conquista que gerou a premiação.
+
+    # Schema de Conquistas
+    Conquistas:
+      required:
+        - nome
+        - descricao
+        - img
+      type: object
+      description: Objeto de representação de uma conquista (badge).
+      properties:
+        id:
+          type: integer
+          description: Identificador único da conquista.
+        nome:
+          type: string
+          description: Título da conquista desbloqueada.
+        descricao:
+          type: string
+          description: Requisitos necessários para desbloquear a conquista.
+        img: 
+          type: string
+          format: uri
+          description: URL ou caminho de referência para o ícone/imagem da conquista.
+
+    # Schema de Recompensas
+    Recompensas:
+      required:
+        - nome
+        - descricao
+        - valor
+        - nivel
+      type: object
+      description: Objeto de representação de uma recompensa resgatável na loja.
+      properties:
+        id:
+          type: integer
+          description: Identificador único da recompensa.
+        nome:
+          type: string
+          description: Nome do item de recompensa.
+        descricao:
+          type: string
+          description: Descrição detalhada da recompensa oferecida.
+        valor: 
+          type: integer
+          description: Custo em moedas (coins) para resgatar a recompensa.
+        nivel:
+          type: integer
+          description: Nível mínimo exigido para o resgate da recompensa.
+
+  requestBodies:
+    Usuarios:
+      description: Payload contendo os dados estruturados do usuário para processamento nas requisições.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Usuarios'
+
+    Missoes:
+      description: Payload contendo os dados estruturados da missão para processamento nas requisições.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Missoes'
+
+    Desafios:
+      description: Payload contendo os dados estruturados do desafio para processamento nas requisições.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Desafios'
+  
+    Educativos:
+      description: Payload contendo os dados estruturados do conteúdo educativo para processamento nas requisições.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Educativos'
+
+    Administrador:
+      description: Payload contendo os dados estruturados do administrador para processamento nas requisições.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Administrador'
+
+    Premiacao:
+      description: Payload contendo os dados estruturados da premiação para processamento nas requisições.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Premiacao'
+
+    Conquistas:
+      description: Payload contendo os dados estruturados da conquista para processamento nas requisições.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Conquistas'
+
+    Recompensas:
+      description: Payload contendo os dados estruturados da recompensa para processamento nas requisições.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Recompensas'
