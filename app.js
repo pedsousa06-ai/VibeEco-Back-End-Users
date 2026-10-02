@@ -1,0 +1,33 @@
+/********************************************************************************************************************************************************************************************
+ * Objetivo: API centralizada para alimentar o sistema dos usuários do VibeEco, fornecendo endpoints para gerenciamento de usuários, missões, desafios, conteúdos educativos, premiações, conquistas e recompensas.
+ * Data: 02/10/2026
+ * Autor: Lucas Kolle
+ * Versão: 1.0.10.26
+ *******************************************************************************************************************************************************************************************/
+
+/* IMPORTAÇÃO DAS DEPENDÊNCIAS */
+const express       = require("express")
+const cors          = require("cors")
+const bodyParser    = require("body-parser")
+
+//criando um objeto para manipular dados do body da API em formato Json
+const bodyParserJSON = bodyParser.json()
+
+//criando um objeto para manipular o express
+const app = express()
+
+//conjunto de permissões a serem aplicados no CORS da API
+const corsOption = {
+    origin: ["*"], //A origrm da requisição (definido por meio do IP (192.168...), quando colocado o "*" fica livre para todas as máquinas)
+    methods: "GET, POST, PUT, DELETE, OPTION", //são os verbos permitidos para serem utilizados na API
+    allowedHeaders: ["content-type", "Autorizations"] //são permissões do cabeçalho do CORS
+}
+
+//configurando as permissões da API atravez do CORS
+app.use(cors(corsOption))
+
+
+//iniciando uma API para receber requisições
+app.listen(8080, function(){ //decidindo a porta para saída do conteúdo
+    console.log("API funcionando e aguardando requisições...") //vai mostrar no terminal que a API já está funcionando
+})
