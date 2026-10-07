@@ -1,14 +1,14 @@
 /********************************************************************************************************************************************************************************************
  * Objetivo: Arquivo responsável pela configuração e padronização das mensagen da API.
  * Data: 02/10/2026
- * Autor: Lucas Kolle
+ * Autor: Riller Feitosa
  * Versão: 1.0.10.26
  *******************************************************************************************************************************************************************************************/
 
 //Criando cabeçalho padronizado para as devolutivas da API
 const DEFAULT_MESSAGE = {
     api_description: "API centralizada para a gestão administrativa, controle de dados e governança da plataforma VibeEco.",
-    development: "Lucas Kolle",
+    development: "Riller Feitosa",
     version: "1.0.10.26",
     status: Boolean,
     status_code: Number,
