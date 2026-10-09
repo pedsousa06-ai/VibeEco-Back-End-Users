@@ -58,7 +58,18 @@ const updatePost = async function (post) {
 //Posts mais recentes
 const selectAllPost = async function () {
     try {
-        let sql = `select * from tbl_post order by id desc`
+        let sql = `select 	
+                        tbl_usuario.nome	 		as nome_usuario,
+                        tbl_usuario.foto			as foto_usuario,
+                        tbl_post.descricao 			as descricao_post, 
+                        tbl_post.data_publicacao 	as data_publicacao_horario,
+                        COUNT(tbl_post_curtida.id)	as qtde_curtida
+	                from tbl_post
+		                inner join tbl_usuario
+			                on tbl_post.id_usuario = tbl_usuario.id
+		                left join tbl_post_curtida
+			                on tbl_post_curtida.id_post = tbl_post.id
+		            order by tbl_post.id desc;`
         let result = await knexConex.raw(sql)
 
         if(Array.isArray(result))
