@@ -30,6 +30,13 @@ const insertNewPost = async function (post) {
                     '${post.descricao}',
 	                now()
             );`
+    //Executar o script no BD
+    let result = await knexConex.raw(sql)
+        //Validando
+        if(result)
+            return result[0].insertId
+        else
+             return false
     } catch (error) {
         //console.log(error)
         return false
@@ -87,6 +94,22 @@ const selectAllRelevantPost = async function () {
     }
 }
 
+//Função para selecionar post pelo id
+const selectPostById = async function (id) {
+    try {
+        //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
+        let sql = `select * from tbl_post where id = ${id}`
+        let result = await knexConex.raw(sql)
+        if(Array.isArray(result)){
+            return result[0]
+        }else
+            return false
+    } catch (error) {
+        //console.log(error)
+        return false
+    }
+}
+
 //Função para deletar um post
 const deletePost = async function (id) {
     try {
@@ -108,5 +131,6 @@ module.exports = {
     updatePost,
     selectAllPost,
     selectAllRelevantPost,
+    selectPostById,
     deletePost
 }

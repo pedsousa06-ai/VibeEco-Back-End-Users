@@ -58,7 +58,7 @@ const updatePostComentario = async function (post_comentario) {
 }
 
 //Funcao para visualizar todos os comentarios do post
-const selectAllPostComentarioById = async function (id) {
+const selectPostComentarioById = async function (id) {
     try {
         let sql = `call procListarComentarios(${id});`
         let result = await knexConex.raw(sql)
@@ -92,6 +92,6 @@ const deletePostComentario = async function (id) {
 module.exports = {
     insertNewPostComentario,
     updatePostComentario,
-    selectAllPostComentarioById,
+    selectPostComentarioById,
     deletePostComentario
 }

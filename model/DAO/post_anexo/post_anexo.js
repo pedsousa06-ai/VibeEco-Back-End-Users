@@ -53,9 +53,9 @@ const updatePostAnexo = async function (post_anexo) {
 }
 
 //Funcao para visualizar todos os anexos do post
-const selectAllPostAnexosById = async function (id) {
+const selectPostAnexosById = async function (id) {
     try {
-        let sql = `call procListarComentarios(${id});`
+        let sql = `call procListarPostAnexos(${id});`
         let result = await knexConex.raw(sql)
 
         if(Array.isArray(result))
@@ -87,6 +87,6 @@ const deletePostAnexo = async function (id) {
 module.exports = {
     insertNewPostAnexo,
     updatePostAnexo,
-    selectAllPostAnexosById,
+    selectPostAnexosById,
     deletePostAnexo
 }

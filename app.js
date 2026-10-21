@@ -1,7 +1,7 @@
 /********************************************************************************************************************************************************************************************
  * Objetivo: API centralizada para alimentar o sistema dos usuários do VibeEco, fornecendo endpoints para gerenciamento de usuários, missões, desafios, conteúdos educativos, premiações, conquistas e recompensas.
- * Data: 02/10/2026
- * Autor: Lucas Kolle
+ * Data: 21/10/2026
+ * Autor: Riller Feitosa
  * Versão: 1.0.10.26
  *******************************************************************************************************************************************************************************************/
 
@@ -10,8 +10,11 @@ const express       = require("express")
 const cors          = require("cors")
 const bodyParser    = require("body-parser")
 
+//Import das controllers do projeto
+const controllerPost = require('./controller/post/controller_post.js')
+
 //criando um objeto para manipular dados do body da API em formato Json
-const bodyParserJSON = bodyParser.json()
+const bodyParserJson = bodyParser.json()
 
 //criando um objeto para manipular o express
 const app = express()
@@ -25,6 +28,50 @@ const corsOption = {
 
 //configurando as permissões da API atravez do CORS
 app.use(cors(corsOption))
+
+//EndPoints
+app.post('/v1/senai/vibeEco/post', bodyParserJson, async function(request, response){
+    //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
+    let dados = request.body
+    let contentType = request.headers['content-type']
+    let result = await controllerPost.inserirNovoPost(dados, contentType)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.get('/v1/senai/vibeEco/post', async function(request, response){
+    let result = await controllerPost.listarPost()
+    response.status(result.status_code)
+    response.json(result)
+})
+
+//Só é utilizado a busca via parâmetro quando o critério de filtro for o id, nas demais ocasiões é via query
+app.get('/v1/senai/vibeEco/post:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerPost.buscarPost(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.put('/v1/senai/vibeEco/post:id', bodyParserJson, async function (request, response) {
+    //Recebe o content-type da requisição
+    let contentType = request.headers['content-type']
+    //Recebe o id a ser atualizado
+    let id = request.params.id
+    //Recebe os dados enviados no corpo da requisição
+    let dados = request.body
+    let result = await controllerPost.atualizarPost(dados, id, contentType)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.delete('/v1/senai/vibeEco/post:id', bodyParserJson, async function (request, response) {
+    let id      = request.params.id
+    let result  = await controllerPost.excluirPost(id)
+    response.status(result.status_code)
+    response.json(result) 
+})
+
 
 
 //iniciando uma API para receber requisições
