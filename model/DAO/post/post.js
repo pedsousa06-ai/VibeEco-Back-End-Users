@@ -58,18 +58,7 @@ const updatePost = async function (post) {
 //Posts mais recentes
 const selectAllPost = async function () {
     try {
-        let sql = `select 	
-                        tbl_usuario.nome	 		as nome_usuario,
-                        tbl_usuario.foto			as foto_usuario,
-                        tbl_post.descricao 			as descricao_post, 
-                        tbl_post.data_publicacao 	as data_publicacao_horario,
-                        COUNT(tbl_post_curtida.id)	as qtde_curtida
-	                from tbl_post
-		                inner join tbl_usuario
-			                on tbl_post.id_usuario = tbl_usuario.id
-		                left join tbl_post_curtida
-			                on tbl_post_curtida.id_post = tbl_post.id
-		            order by tbl_post.id desc;`
+        let sql = `select * from vwPostRecente;`
         let result = await knexConex.raw(sql)
 
         if(Array.isArray(result))
@@ -84,7 +73,18 @@ const selectAllPost = async function () {
 
 //Posts mais relevantes
 const selectAllRelevantPost = async function () {
-    
+    try {
+        let sql = `select * from vwPostCurtidas;`
+        let result = await knexConex.raw(sql)
+
+        if(Array.isArray(result))
+            return result [0]
+        else
+            return false
+    } catch (error) {
+        //console.log(error)
+        return false
+    }
 }
 
 //Função para deletar um post
