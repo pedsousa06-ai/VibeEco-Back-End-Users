@@ -79,23 +79,6 @@ Autenticação → Perfil → Feed → Missões → Desafios → Conteúdos
 
 ---
 
-## 🔌 Endpoints
-
-<!-- TODO: documentar os endpoints reais (método, rota, descrição, autenticação) -->
-
-| Módulo | Método | Rota | Descrição |
-|--------|--------|------|-----------|
-| Autenticação | `POST` | `/auth/login` | Login do usuário *(exemplo — ajustar)* |
-| ... | ... | ... | ... |
-
----
-
-## ⚙️ Como executar
-
-<!-- TODO: informar linguagem/framework, versões e comandos reais -->
-
-### Pré-requisitos
-
 - `<Linguagem / runtime e versão>`
 - Banco de dados do VibeEco em funcionamento (ver [VibeEco-DataBase](https://github.com/pedsousa06-ai/VibeEco-DataBase))
 
