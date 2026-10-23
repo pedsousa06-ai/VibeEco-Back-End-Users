@@ -37,7 +37,7 @@ const inserirNovoPost = async function(post, contentType) {
         }
         return message.DEFAULT_MESSAGE  //Retorno da mensagem do try
     } catch (error) {
-        //console.log(error)
+        console.log(error)
         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500(controller)
     }
 }
@@ -59,9 +59,9 @@ const atualizarPost = async function (post, id, contentype) {
                     //Chama a função do DAO para atualizar o post
                     let result = await postDAO.updatePost(post)
                     if(result){
-                        message.DEFAULT_MESSAGE.status      = message.SUCESS_UPDATE_ITEM.status
-                        message.DEFAULT_MESSAGE.status_code = message.SUCESS_UPDATE_ITEM.status_code
-                        message.DEFAULT_MESSAGE.message     = message.SUCESS_UPDATE_ITEM.message
+                        message.DEFAULT_MESSAGE.status      = message.SUCCESS_UPDATE_ITEM.status
+                        message.DEFAULT_MESSAGE.status_code = message.SUCCESS_UPDATE_ITEM.status_code
+                        message.DEFAULT_MESSAGE.message     = message.SUCCESS_UPDATE_ITEM.message
                         message.DEFAULT_MESSAGE.response    = post
                         return message.DEFAULT_MESSAGE //200 (Atualizado)
                     }else{
@@ -165,9 +165,9 @@ const excluirPost = async function (id) {
         if(resultBuscarID.status){
             let result = await postDAO.deletePost(id)
             if(result){
-                message.DEFAULT_MESSAGE.status      = message.SUCESS_DELETE_ITEM.status
-                message.DEFAULT_MESSAGE.status_code = message.SUCESS_DELETE_ITEM.status_code
-                message.DEFAULT_MESSAGE.message     = message.SUCESS_DELETE_ITEM.message
+                message.DEFAULT_MESSAGE.status      = message.SUCCESS_DELETED_ITEM.status
+                message.DEFAULT_MESSAGE.status_code = message.SUCCESS_DELETED_ITEM.status_code
+                message.DEFAULT_MESSAGE.message     = message.SUCCESS_DELETED_ITEM.message
                 
                 return message.DEFAULT_MESSAGE
             }else{
@@ -177,6 +177,7 @@ const excluirPost = async function (id) {
             return resultBuscarID //404 (not found), 400 (error bad request), 500 (data base), 500 (controller) 
         }
     } catch (error) {
+        //console.log(error)
         return message.DEFAULT_MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
     }
 }

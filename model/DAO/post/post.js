@@ -48,8 +48,8 @@ const updatePost = async function (post) {
     try {
     let sql = `update tbl_post set
         id_usuario      =  ${post.id_usuario},
-        descricao       = '${post.descricao}',
-        wherer id       =  ${post.id};`
+        descricao       = '${post.descricao}'
+        where id       =  ${post.id};`
 
     let result = await knexConex.raw(sql)
     if(result)
@@ -98,10 +98,10 @@ const selectAllRelevantPost = async function () {
 const selectPostById = async function (id) {
     try {
         //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `select * from tbl_post where id = ${id}`
+        let sql = `call procListarPostViaId(${id});`
         let result = await knexConex.raw(sql)
         if(Array.isArray(result)){
-            return result[0]
+            return result[0][0]
         }else
             return false
     } catch (error) {

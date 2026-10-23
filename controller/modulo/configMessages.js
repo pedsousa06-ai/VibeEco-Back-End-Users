@@ -47,19 +47,19 @@ const ERROR_NOT_FOUND = {
 }
 
 //Criando mensagens de sucesso da API
-const SUCESS_CREATED_ITEM = {
+const SUCCESS_CREATED_ITEM = {
     status: true,
     status_code: 201,
     message: "Registro inserido com sucesso!"
 }
 
-const SUCESS_CREATED_ITEM_WARNING = {
+const SUCCESS_CREATED_ITEM_WARNING = {
     status: true,
     status_code: 201,
     message: "Os dados principais foram inseridos com sucesso, porém alguns dados apresentaram problemas e não foram inseridos!"
 }
 
-const SUCESS_RESPONSE = {
+const SUCCESS_RESPONSE = {
     status: true,
     status_code: 200
 }
@@ -85,9 +85,9 @@ module.exports = {
     ERROR_INTERNAL_SERVER_CONTROLLER,
     ERROR_CONTENT_TYPE,
     ERROR_NOT_FOUND,
-    SUCESS_CREATED_ITEM,
-    SUCESS_RESPONSE,
+    SUCCESS_CREATED_ITEM,
+    SUCCESS_RESPONSE,
     SUCCESS_DELETED_ITEM,
     SUCCESS_UPDATE_ITEM,
-    SUCESS_CREATED_ITEM_WARNING
+    SUCCESS_CREATED_ITEM_WARNING
 }

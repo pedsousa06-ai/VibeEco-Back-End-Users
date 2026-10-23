@@ -39,21 +39,29 @@ app.post('/v1/senai/vibeEco/post', bodyParserJson, async function(request, respo
     response.json(result)
 })
 
-app.get('/v1/senai/vibeEco/post', async function(request, response){
+//Seleciona todos os post mais recentes
+app.get('/v1/senai/vibeEco/postRecente', async function(request, response){
     let result = await controllerPost.listarPost()
     response.status(result.status_code)
     response.json(result)
 })
 
+//Seleciona todos os posts tendo como critério de filtro as curtidas
+app.get('/v1/senai/vibeEco/postCurtida', async function(request, response){
+    let result = await controllerPost.listarPostRelevantes()
+    response.status(result.status_code)
+    response.json(result)
+})
+
 //Só é utilizado a busca via parâmetro quando o critério de filtro for o id, nas demais ocasiões é via query
-app.get('/v1/senai/vibeEco/post:id', async function(request, response){
+app.get('/v1/senai/vibeEco/post/:id', async function(request, response){
     let id = request.params.id
     let result = await controllerPost.buscarPost(id)
     response.status(result.status_code)
     response.json(result)
 })
 
-app.put('/v1/senai/vibeEco/post:id', bodyParserJson, async function (request, response) {
+app.put('/v1/senai/vibeEco/post/:id', bodyParserJson, async function (request, response) {
     //Recebe o content-type da requisição
     let contentType = request.headers['content-type']
     //Recebe o id a ser atualizado
@@ -65,13 +73,12 @@ app.put('/v1/senai/vibeEco/post:id', bodyParserJson, async function (request, re
     response.json(result)
 })
 
-app.delete('/v1/senai/vibeEco/post:id', bodyParserJson, async function (request, response) {
+app.delete('/v1/senai/vibeEco/post/:id', bodyParserJson, async function (request, response) {
     let id      = request.params.id
     let result  = await controllerPost.excluirPost(id)
     response.status(result.status_code)
     response.json(result) 
 })
-
 
 
 //iniciando uma API para receber requisições
