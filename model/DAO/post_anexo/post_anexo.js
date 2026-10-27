@@ -39,7 +39,7 @@ const updatePostAnexo = async function (post_anexo) {
     let sql = `update tbl_post_anexo set
         id_usuario      =  ${post_anexo.id_usuario},
         id_post         = '${post_anexo.id_post}',
-        wherer id       =  ${post_anexo.id};`
+        where id       =  ${post_anexo.id};`
 
     let result = await knexConex.raw(sql)
     if(result)

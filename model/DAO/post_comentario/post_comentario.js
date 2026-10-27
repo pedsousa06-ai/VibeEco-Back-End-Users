@@ -44,7 +44,7 @@ const updatePostComentario = async function (post_comentario) {
         id_usuario      =  ${post_comentario.id_usuario},
         id_post         = '${post_comentario.id_post}',
         comentario      = '${post_comentario.comentario}'
-        wherer id       =  ${post_comentario.id};`
+        where id       =   ${post_comentario.id};`
 
     let result = await knexConex.raw(sql)
     if(result)

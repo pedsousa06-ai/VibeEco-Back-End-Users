@@ -13,25 +13,25 @@ const config_message = require('../modulo/configMessages.js')
 const postCategoriaDAO = require('../../model/DAO/post_categoria/post_categoria.js')
 
 //Criar
-const inserirNovoPostCategoria = async function(filmeGenero) {
+const inserirNovoPostCategoria = async function(postCategoria) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
-        let validar = await validarDados(filmeGenero)
+        let validar = await validarDados(postCategoria)
         if(validar)
             return validar //400
         else{
-            let result = await postCategoriaDAO.insertFilmeGenero(filmeGenero)
+            let result = await postCategoriaDAO.insertNewPostCategoria(postCategoria)
             if(result){
                 /*
                     Criando o atributo ID no JSON do genero e colocando
                     o ID gerado após o insert
                 */
-               filmeGenero.id = result
+               postCategoria.id = result
                message.DEFAULT_MESSAGE.status       = message.SUCCESS_CREATED_ITEM.status
                message.DEFAULT_MESSAGE.status_code  = message.SUCCESS_CREATED_ITEM.status_code
                message.DEFAULT_MESSAGE.message      = message.SUCCESS_CREATED_ITEM.message
-               message.DEFAULT_MESSAGE.response     = filmeGenero //201
+               message.DEFAULT_MESSAGE.response     = postCategoria //201
             }else
                 message.ERROR_INTERNAL_SERVER_MODEL //500(banco de dados)
         }
@@ -42,24 +42,24 @@ const inserirNovoPostCategoria = async function(filmeGenero) {
 }
 
 //Atualizar
-const atualizarPostCategoria = async function (filmeGenero, id) {
+const atualizarPostCategoria = async function (postCategoria, id) {
     //Criando um clone do objeto JSON para manipular sua estrutura sem modificar o arquivo original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
-            let resultBuscarID = await buscarFilmeGenero(id)
+            let resultBuscarID = await buscarPostCategoria(id)
             if(resultBuscarID.status){
                 //Validação de campos obrigatórios para atualização (body)
-                let validar = await validarDados(filmeGenero)
+                let validar = await validarDados(postCategoria)
                 if(!validar){
-                    //Adicionando o atributo ID do gênero no JSON para ser enviado ao DAO
-                    filmeGenero.id = id
-                    //Chama a função do DAO para atualizar o gênero
-                    let result = await postCategoriaDAO.updateFilmeGenero(filmeGenero)
+                    //Adicionando o atributo ID da categoria no JSON para ser enviado ao DAO
+                    postCategoria.id = id
+                    //Chama a função do DAO para atualizar a categoria
+                    let result = await postCategoriaDAO.updatePostCategoria(postCategoria)
                     if(result){
                         message.DEFAULT_MESSAGE.status      = message.SUCESS_UPDATE_ITEM.status
                         message.DEFAULT_MESSAGE.status_code = message.SUCESS_UPDATE_ITEM.status_code
                         message.DEFAULT_MESSAGE.message     = message.SUCESS_UPDATE_ITEM.message
-                        message.DEFAULT_MESSAGE.response    = filmeGenero
+                        message.DEFAULT_MESSAGE.response    = postCategoria
                         return message.DEFAULT_MESSAGE //200 (Atualizado)
                     }else
                         return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
@@ -73,32 +73,6 @@ const atualizarPostCategoria = async function (filmeGenero, id) {
 }   
 
 //Ler
-const listarPostCategoria = async function () {
-    //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
-    let message = JSON.parse(JSON.stringify(config_message))
-    try {
-        //Chama a função do DAO para retornar a lista de todos os filmes
-        let result = await postCategoriaDAO.selectAllFilmeGenero()
-        //Validação para verificar se o DAO conseguiu processar os dados
-        if(result){
-            //Validação para verificar se existe conteúdo no array
-            if(result.length > 0){
-                message.DEFAULT_MESSAGE.status                      = message.SUCCESS_RESPONSE.status
-                message.DEFAULT_MESSAGE.status_code                 = message.SUCCESS_RESPONSE.status_code
-                message.DEFAULT_MESSAGE.response.count              = result.length
-                message.DEFAULT_MESSAGE.response.filme_genero       = result
-                return message.DEFAULT_MESSAGE
-            }else
-                return message.ERROR_NOT_FOUND //404 (Dados não encontrado)
-        }else
-            return message.ERROR_INTERNAL_SERVER_MODEL //500 (model) Erro no BD
-    } catch (error) {
-        console.log(error)
-        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller) Erro no backEnd
-    }
-}
-
-//Ler
 const buscarPostCategoria = async function (id) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
@@ -108,12 +82,12 @@ const buscarPostCategoria = async function (id) {
             message.ERROR_BAD_REQUEST //400
             return message.ERROR_BAD_REQUEST
         }else{
-            let result = await postCategoriaDAO.selectByIdFilmeGenero(id)
+            let result = await postCategoriaDAO.selectPostCategoriasById(id)
             if(result){
                 if(result.length > 0){
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.filme_genero = result //201
+                    message.DEFAULT_MESSAGE.response.postCategoria = result //201
                     return message.DEFAULT_MESSAGE
                 }else{
                     return message.ERROR_NOT_FOUND //404 (Não encontrado)
@@ -128,21 +102,21 @@ const buscarPostCategoria = async function (id) {
 }
 
 //Ler
-const buscarPostIdCategoria = async function (idGenero) {
+const buscarPostIdCategoria = async function (idCategoria) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
         //Validação para garantir que o id seja válido
-        if(idGenero == '' || idGenero == null || idGenero == undefined || isNaN(idGenero)){
-            message.ERROR_BAD_REQUEST.field = '[ID GENÊRO] INVÁLIDO' //400
+        if(idCategoria == '' || idCategoria == null || idCategoria == undefined || isNaN(idCategoria)){
+            message.ERROR_BAD_REQUEST.field = '[ID CATEGORIA] INVÁLIDO' //400
             return message.ERROR_BAD_REQUEST
         }else{
-            let result = await postCategoriaDAO.selectFilmesByIdGenero(idGenero)
+            let result = await postCategoriaDAO.selectPostCategoriasByIdCategoria(idCategoria)
             if(result){
                 if(result.length > 0){
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.filme_genero = result //201
+                    message.DEFAULT_MESSAGE.response.postCategoria = result //201
                     return message.DEFAULT_MESSAGE
                 }else{
                     return message.ERROR_NOT_FOUND //404 (Não encontrado)
@@ -157,21 +131,21 @@ const buscarPostIdCategoria = async function (idGenero) {
 }
 
 //Ler
-const buscarCategoriaIdPost = async function (idFilme) {
+const buscarCategoriaIdPost = async function (idPost) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
         //Validação para garantir que o id seja válido
-        if(idFilme == '' || idFilme == null || idFilme == undefined || isNaN(idFilme)){
-            message.ERROR_BAD_REQUEST.field = '[ID FILME] INVÁLIDO' //400
+        if(idPost == '' || idPost == null || idPost == undefined || isNaN(idPost)){
+            message.ERROR_BAD_REQUEST.field = '[ID POST] INVÁLIDO' //400
             return message.ERROR_BAD_REQUEST
         }else{
-            let result = await postCategoriaDAO.selectGenerosByIdFilme(idFilme)
+            let result = await postCategoriaDAO.selectPostCategoriasByIdPost(idPost)
             if(result){
                 if(result.length > 0){
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.filme_genero = result //201
+                    message.DEFAULT_MESSAGE.response.postCategoria = result //201
                     return message.DEFAULT_MESSAGE
                 }else{
                     return message.ERROR_NOT_FOUND //404 (Não encontrado)
@@ -190,9 +164,9 @@ const excluirPostCategoria = async function (id) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar o arquivo original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
-        let resultBuscarID = await buscarFilmeGenero(id)
+        let resultBuscarID = await buscarPostCategoria(id)
         if(resultBuscarID.status){
-            let result = await postCategoriaDAO.deleteFilmeGenero(id)
+            let result = await postCategoriaDAO.deletePostCategoria(id)
             if(result){
                 message.DEFAULT_MESSAGE.status      = message.SUCESS_DELETE_ITEM.status
                 message.DEFAULT_MESSAGE.status_code = message.SUCESS_DELETE_ITEM.status_code
@@ -211,11 +185,11 @@ const excluirPostCategoria = async function (id) {
 }
 
 //Excluir (Função para excluir os gêneros relacionados com o filme)
-const excluirCategoriasIdPost = async function (idFilme) {
+const excluirCategoriasIdPost = async function (idPost) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar o arquivo original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
-            let result = await postCategoriaDAO.deleteGenerosByIdFilme(idFilme)
+            let result = await postCategoriaDAO.deleteCategoriasByIdPost(idPost)
             if(result){
                 message.DEFAULT_MESSAGE.status      = message.SUCESS_DELETE_ITEM.status
                 message.DEFAULT_MESSAGE.status_code = message.SUCESS_DELETE_ITEM.status_code
@@ -231,17 +205,17 @@ const excluirCategoriasIdPost = async function (idFilme) {
 }
 
 //Função de validação (não há a necessidade de exporta-la)
-const validarDados = async function (filmeGenero) {
+const validarDados = async function (postCategoria) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar o arquivo original
     let message = JSON.parse(JSON.stringify(config_message))
-    //Validação de dados para os atributos do gênero (400)
-        if(filmeGenero.id_filme == '' || filmeGenero.id_filme == null || filmeGenero.id_filme == undefined || isNaN(filmeGenero.id_filme)){
+    //Validação de dados para os atributos da categoria (400)
+        if(postCategoria.id_post == '' || postCategoria.id_post == null || postCategoria.id_post == undefined || isNaN(postCategoria.id_post)){
             //Criando um atributo no clone da padronização de mensagens
             message.ERROR_BAD_REQUEST.field = '[ID_FILME] INVÁLIDO' //400
             return message.ERROR_BAD_REQUEST
-        } else if(filmeGenero.id_genero == '' || filmeGenero.id_genero == null || filmeGenero.id_genero == undefined || isNaN(filmeGenero.id_genero)){
+        } else if(postCategoria.id_categoria == '' || postCategoria.id_categoria == null || postCategoria.id_categoria == undefined || isNaN(postCategoria.id_categoria)){
             //Criando um atributo no clone da padronização de mensagens
-            message.ERROR_BAD_REQUEST.field = '[ID_GÊNERO] INVÁLIDO' //400
+            message.ERROR_BAD_REQUEST.field = '[ID_CATEGORIA] INVÁLIDO' //400
             return message.ERROR_BAD_REQUEST
         }else
             return false

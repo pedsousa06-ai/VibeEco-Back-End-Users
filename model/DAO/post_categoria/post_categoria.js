@@ -39,7 +39,7 @@ const updatePostCategoria = async function (post_categoria) {
     let sql = `update tbl_post_categoria set
         id_post      =  ${post_categoria.id_post},
         id_categoria = '${post_categoria.id_categoria}',
-        wherer id    =  ${post_categoria.id};`
+        where id    =   ${post_categoria.id};`
 
     let result = await knexConex.raw(sql)
     if(result)
@@ -56,6 +56,38 @@ const updatePostCategoria = async function (post_categoria) {
 const selectPostCategoriasById = async function (id) {
     try {
         let sql = `call procListarPostCategorias(${id});`
+        let result = await knexConex.raw(sql)
+
+        if(Array.isArray(result))
+            return result [0]
+        else
+            return false
+    } catch (error) {
+        //console.log(error)
+        return false
+    }
+}
+
+//Funcao para visualizar todos as categorias do post
+const selectPostCategoriasByIdPost = async function (id) {
+    try {
+        let sql = `call procListarCategoriasByIdPost(${id});`
+        let result = await knexConex.raw(sql)
+
+        if(Array.isArray(result))
+            return result [0]
+        else
+            return false
+    } catch (error) {
+        //console.log(error)
+        return false
+    }
+}
+
+//Funcao para visualizar todos as categorias do post
+const selectPostCategoriasByIdCategoria = async function (id) {
+    try {
+        let sql = `call procListarPostByIdCategoria(${id});`
         let result = await knexConex.raw(sql)
 
         if(Array.isArray(result))
@@ -88,5 +120,7 @@ module.exports = {
     insertNewPostCategoria,
     updatePostCategoria,
     selectPostCategoriasById,
+    selectPostCategoriasByIdPost,
+    selectPostCategoriasByIdCategoria,
     deletePostCategoria
 }
