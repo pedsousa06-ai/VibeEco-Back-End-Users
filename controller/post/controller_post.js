@@ -12,6 +12,9 @@ const config_message = require('../modulo/configMessages.js')
 //Import do arquivo DAO para fazer o CRUD do post no banco de dados
 const postDAO = require('../../model/DAO/post/post.js')
 
+//Import das controllers
+const controller_post_categoria = require('./controller_post_categoria.js')
+
 //Criar
 const inserirNovoPost = async function(post, contentType) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
@@ -28,6 +31,19 @@ const inserirNovoPost = async function(post, contentType) {
                     o ID gerado após o insert
                 */
                post.id = result
+
+                //Manipulação de dados para inserir os gêneros do filme
+                for(categoria of post.categoria){
+                    //Cria o objeto JSON com o id do filme e o id do gênero
+                    let postCategoria = {
+                        "id_post": post.id,
+                        "id_categoria": categoria.id
+                    }
+                    //Chama a controller do filme_genero para inserir os IDs
+                    let resultInsertCategoria = await controller_post_categoria.inserirNovoPostCategoria(postCategoria)
+                    if(!resultInsertCategoria)
+                        return message.SUCCESS_CREATED_ITEM_WARNING //201 (ok, porém com WARNING)
+                }
                message.DEFAULT_MESSAGE.status       = message.SUCCESS_CREATED_ITEM.status
                message.DEFAULT_MESSAGE.status_code  = message.SUCCESS_CREATED_ITEM.status_code
                message.DEFAULT_MESSAGE.message      = message.SUCCESS_CREATED_ITEM.message
@@ -59,6 +75,25 @@ const atualizarPost = async function (post, id, contentype) {
                     //Chama a função do DAO para atualizar o post
                     let result = await postDAO.updatePost(post)
                     if(result){
+
+                        //Manipulação de dados na tabela de relação entre post e categoria
+                        let resultDeleteCategoria = await controller_post_categoria.excluirCategoriaIdPost(post.id)
+                        //Após a exclusão de todos as categorias com o post
+                        if(resultDeleteCategoria.status){
+                            //Manipulação de dados para inserir as categorias do post
+                            for(categoria of post.categoria){
+                                //Cria o objeto JSON com o id do filme e o id do gênero
+                                let postCategoria = {
+                                "id_post": post.id,
+                                "id_categoria": categoria.id
+                                }
+                                //Chama a controller do post_categoria para inserir os IDs
+                                let resultInsertCategoria = await controller_post_categoria.inserirNovoPostCategoria(postCategoria)
+                                if(!resultInsertCategoria)
+                                    return message.SUCCESS_CREATED_ITEM_WARNING //201 (ok, porém com WARNING)
+                            }
+                        }
+
                         message.DEFAULT_MESSAGE.status      = message.SUCCESS_UPDATE_ITEM.status
                         message.DEFAULT_MESSAGE.status_code = message.SUCCESS_UPDATE_ITEM.status_code
                         message.DEFAULT_MESSAGE.message     = message.SUCCESS_UPDATE_ITEM.message
@@ -74,25 +109,33 @@ const atualizarPost = async function (post, id, contentype) {
         }else
             return message.DEFAULT_MESSAGE.ERROR_CONTENT_TYPE //415(contentType)
     } catch (error) {
+        console.log(error)
         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
     }
 }   
 
-//Ler
+//Ler os posts mais recentes
 const listarPost = async function () {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
-        //Chama a função do DAO para retornar a lista de todos os filmes
+        //Chama a função do DAO para retornar a lista de todos os posts
         let result = await postDAO.selectAllPost()
         //Validação para verificar se o DAO conseguiu processar os dados
         if(result){
+            for(post of result){
+                //Cria o objeto de categorias relacionados ao post
+                let resultCategoria = await controller_post_categoria.buscarCategoriasIdPost(post.id)
+                if(resultCategoria.status){
+                    post.categoria = resultCategoria.response.post_categoria
+                }
+            }
             //Validação para verificar se existe conteúdo no array
             if(result.length > 0){
                 message.DEFAULT_MESSAGE.status              = message.SUCCESS_RESPONSE.status
                 message.DEFAULT_MESSAGE.status_code         = message.SUCCESS_RESPONSE.status_code
                 message.DEFAULT_MESSAGE.response.count      = result.length
-                message.DEFAULT_MESSAGE.response.post     = result
+                message.DEFAULT_MESSAGE.response.post       = result
                 return message.DEFAULT_MESSAGE
             }else
                 return message.ERROR_NOT_FOUND //404 (Dados não encontrado)
@@ -111,6 +154,13 @@ const listarPostRelevantes = async function () {
     try {
         let result = await postDAO.selectAllRelevantPost()
             if(result){
+                for(post of result){
+                    //Cria o objeto de categorias relacionados ao post
+                    let resultCategoria = await controller_post_categoria.buscarCategoriasIdPost(post.id)
+                    if(resultCategoria.status){
+                        post.categoria = resultCategoria.response.post_categoria
+                    }
+                }
                 if(result.length > 0){
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
@@ -140,6 +190,13 @@ const buscarPost = async function (id) {
             let result = await postDAO.selectPostById(id)
             if(result){
                 if(result.length > 0){
+                    for(post of result){
+                        //Cria o objeto de categorias relacionados ao post
+                        let resultCategoria = await controller_post_categoria.buscarCategoriasIdPost(post.id)
+                        if(resultCategoria.status){
+                            post.categoria = resultCategoria.response.post_categoria
+                        }
+                    }
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
                     message.DEFAULT_MESSAGE.response.post = result //201

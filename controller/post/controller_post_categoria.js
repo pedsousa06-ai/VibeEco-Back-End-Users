@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Objetivo: Arquivo responsável pela validação, tratamento e manipulação
-   de dados para o CRUD de post_categoria
- * Data: 23.10.2026
+   de dados para o CRUD de filme_genero
+ * Data: 28.10.2026
  * Autor: Riller
  * Versão: 1.0
  ****************************************************************************/
@@ -21,7 +21,7 @@ const inserirNovoPostCategoria = async function(postCategoria) {
         if(validar)
             return validar //400
         else{
-            let result = await postCategoriaDAO.insertNewPostCategoria(postCategoria)
+            let result = await postCategoriaDAO.insertPostCategoria(postCategoria)
             if(result){
                 /*
                     Criando o atributo ID no JSON do genero e colocando
@@ -73,6 +73,32 @@ const atualizarPostCategoria = async function (postCategoria, id) {
 }   
 
 //Ler
+const listarPostCategoria = async function () {
+    //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
+    let message = JSON.parse(JSON.stringify(config_message))
+    try {
+        //Chama a função do DAO para retornar a lista de todos os posts
+        let result = await postCategoriaDAO.selectAllPostCategoria()
+        //Validação para verificar se o DAO conseguiu processar os dados
+        if(result){
+            //Validação para verificar se existe conteúdo no array
+            if(result.length > 0){
+                message.DEFAULT_MESSAGE.status                      = message.SUCCESS_RESPONSE.status
+                message.DEFAULT_MESSAGE.status_code                 = message.SUCCESS_RESPONSE.status_code
+                message.DEFAULT_MESSAGE.response.count              = result.length
+                message.DEFAULT_MESSAGE.response.postCategoria      = result
+                return message.DEFAULT_MESSAGE
+            }else
+                return message.ERROR_NOT_FOUND //404 (Dados não encontrado)
+        }else
+            return message.ERROR_INTERNAL_SERVER_MODEL //500 (model) Erro no BD
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller) Erro no backEnd
+    }
+}
+
+//Ler
 const buscarPostCategoria = async function (id) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
@@ -82,12 +108,12 @@ const buscarPostCategoria = async function (id) {
             message.ERROR_BAD_REQUEST //400
             return message.ERROR_BAD_REQUEST
         }else{
-            let result = await postCategoriaDAO.selectPostCategoriasById(id)
+            let result = await postCategoriaDAO.selectByIdPostCategoria(id)
             if(result){
                 if(result.length > 0){
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.postCategoria = result //201
+                    message.DEFAULT_MESSAGE.response.post_categoria = result //201
                     return message.DEFAULT_MESSAGE
                 }else{
                     return message.ERROR_NOT_FOUND //404 (Não encontrado)
@@ -111,12 +137,12 @@ const buscarPostIdCategoria = async function (idCategoria) {
             message.ERROR_BAD_REQUEST.field = '[ID CATEGORIA] INVÁLIDO' //400
             return message.ERROR_BAD_REQUEST
         }else{
-            let result = await postCategoriaDAO.selectPostCategoriasByIdCategoria(idCategoria)
+            let result = await postCategoriaDAO.selectPostByIdCategoria(idCategoria)
             if(result){
                 if(result.length > 0){
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.postCategoria = result //201
+                    message.DEFAULT_MESSAGE.response.post_categoria = result //201
                     return message.DEFAULT_MESSAGE
                 }else{
                     return message.ERROR_NOT_FOUND //404 (Não encontrado)
@@ -131,7 +157,7 @@ const buscarPostIdCategoria = async function (idCategoria) {
 }
 
 //Ler
-const buscarCategoriaIdPost = async function (idPost) {
+const buscarCategoriasIdPost = async function (idPost) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
@@ -140,22 +166,22 @@ const buscarCategoriaIdPost = async function (idPost) {
             message.ERROR_BAD_REQUEST.field = '[ID POST] INVÁLIDO' //400
             return message.ERROR_BAD_REQUEST
         }else{
-            let result = await postCategoriaDAO.selectPostCategoriasByIdPost(idPost)
+            let result = await postCategoriaDAO.selectCategoriasByIdPost(idPost)
             if(result){
                 if(result.length > 0){
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.postCategoria = result //201
+                    message.DEFAULT_MESSAGE.response.post_categoria = result //201
                     return message.DEFAULT_MESSAGE
                 }else{
                     return message.ERROR_NOT_FOUND //404 (Não encontrado)
                 }
             }else{
-               return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
+                return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
             }
         }
     } catch (error) {
-       return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
     }    
 }
 
@@ -185,15 +211,15 @@ const excluirPostCategoria = async function (id) {
 }
 
 //Excluir (Função para excluir os gêneros relacionados com o filme)
-const excluirCategoriasIdPost = async function (idPost) {
+const excluirCategoriaIdPost = async function (idPost) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar o arquivo original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
             let result = await postCategoriaDAO.deleteCategoriasByIdPost(idPost)
             if(result){
-                message.DEFAULT_MESSAGE.status      = message.SUCESS_DELETE_ITEM.status
-                message.DEFAULT_MESSAGE.status_code = message.SUCESS_DELETE_ITEM.status_code
-                message.DEFAULT_MESSAGE.message     = message.SUCESS_DELETE_ITEM.message
+                message.DEFAULT_MESSAGE.status      = message.SUCCESS_DELETED_ITEM.status
+                message.DEFAULT_MESSAGE.status_code = message.SUCCESS_DELETED_ITEM.status_code
+                message.DEFAULT_MESSAGE.message     = message.SUCCESS_DELETED_ITEM.message
                 
                 return message.DEFAULT_MESSAGE
             }else{
@@ -208,10 +234,10 @@ const excluirCategoriasIdPost = async function (idPost) {
 const validarDados = async function (postCategoria) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar o arquivo original
     let message = JSON.parse(JSON.stringify(config_message))
-    //Validação de dados para os atributos da categoria (400)
+    //Validação de dados para os atributos do post (400)
         if(postCategoria.id_post == '' || postCategoria.id_post == null || postCategoria.id_post == undefined || isNaN(postCategoria.id_post)){
             //Criando um atributo no clone da padronização de mensagens
-            message.ERROR_BAD_REQUEST.field = '[ID_FILME] INVÁLIDO' //400
+            message.ERROR_BAD_REQUEST.field = '[ID_POST] INVÁLIDO' //400
             return message.ERROR_BAD_REQUEST
         } else if(postCategoria.id_categoria == '' || postCategoria.id_categoria == null || postCategoria.id_categoria == undefined || isNaN(postCategoria.id_categoria)){
             //Criando um atributo no clone da padronização de mensagens
@@ -222,12 +248,12 @@ const validarDados = async function (postCategoria) {
 }
 
 module.exports = {
-    inserirNovoFilmeGenero,
-    atualizarFilmeGenero,
-    listarFilmeGeneros,
-    buscarFilmeGenero,
-    buscarFilmeIdGenero,
-    buscarGeneroIdFilme,
-    excluirFilmeGenero,
-    excluirGenerosIdFilme
+    inserirNovoPostCategoria,
+    atualizarPostCategoria,
+    listarPostCategoria,
+    buscarPostCategoria,
+    buscarPostIdCategoria,
+    buscarCategoriasIdPost,
+    excluirPostCategoria,
+    excluirCategoriaIdPost
 }
