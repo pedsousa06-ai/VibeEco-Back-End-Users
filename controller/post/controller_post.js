@@ -13,7 +13,8 @@ const config_message = require('../modulo/configMessages.js')
 const postDAO = require('../../model/DAO/post/post.js')
 
 //Import das controllers
-const controller_post_categoria = require('./controller_post_categoria.js')
+const controller_post_categoria  = require('./controller_post_categoria.js')
+const controller_post_comentario  = require('./controller_post_comentario.js')
 
 //Criar
 const inserirNovoPost = async function(post, contentType) {
@@ -130,6 +131,13 @@ const listarPost = async function () {
                     post.categoria = resultCategoria.response.post_categoria
                 }
             }
+            for(post of result){
+                //Cria o objeto de categorias relacionados ao post
+                let resultComentario = await controller_post_comentario.buscarPostComentario(post.id)
+                if(resultComentario.status){
+                    post.comentario = resultComentario.response.post_comentario
+                }
+            }
             //Validação para verificar se existe conteúdo no array
             if(result.length > 0){
                 message.DEFAULT_MESSAGE.status              = message.SUCCESS_RESPONSE.status
@@ -159,6 +167,13 @@ const listarPostRelevantes = async function () {
                     let resultCategoria = await controller_post_categoria.buscarCategoriasIdPost(post.id)
                     if(resultCategoria.status){
                         post.categoria = resultCategoria.response.post_categoria
+                    }
+                }
+                for(post of result){
+                    //Cria o objeto de categorias relacionados ao post
+                    let resultComentario = await controller_post_comentario.buscarPostComentario(post.id)
+                    if(resultComentario.status){
+                        post.comentario = resultComentario.response.post_comentario
                     }
                 }
                 if(result.length > 0){
@@ -195,6 +210,13 @@ const buscarPost = async function (id) {
                         let resultCategoria = await controller_post_categoria.buscarCategoriasIdPost(post.id)
                         if(resultCategoria.status){
                             post.categoria = resultCategoria.response.post_categoria
+                        }
+                    }
+                    for(post of result){
+                        //Cria o objeto de categorias relacionados ao post
+                        let resultComentario = await controller_post_comentario.buscarPostComentario(post.id)
+                        if(resultComentario.status){
+                            post.comentario = resultComentario.response.post_comentario
                         }
                     }
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status

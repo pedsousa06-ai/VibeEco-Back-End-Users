@@ -1,6 +1,6 @@
 /*****************************************************************************
  * Objetivo: Arquivo responsável pela validação, tratamento e manipulação
-   de dados para o CRUD de filme_genero
+   de dados para o CRUD de post_categoria
  * Data: 28.10.2026
  * Autor: Riller
  * Versão: 1.0
