@@ -9,6 +9,16 @@
 const express       = require("express")
 const cors          = require("cors")
 const bodyParser    = require("body-parser")
+const multer        = require('multer')
+//Configuração para o multer enviar o arquivo de imagem
+const storage       = multer.diskStorage({
+    destination: function(request, file, cb){
+        cb(null, 'uploads/')
+    }
+})
+//Instancia para criar um objeto upload
+const upload        = multer()
+
 
 //Import das controllers do projeto
 const controllerPost = require('./controller/post/controller_post.js')
@@ -31,11 +41,13 @@ const corsOption = {
 app.use(cors(corsOption))
 
 //EndPoints
-app.post('/v1/senai/vibeEco/post', bodyParserJson, async function(request, response){
+app.post('/v1/senai/vibeEco/post', bodyParserJson, upload.single(anexo), async function(request, response){
     //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
     let dados = request.body
     let contentType = request.headers['content-type']
-    let result = await controllerPost.inserirNovoPost(dados, contentType)
+    //Recebe o arquivo de imagem enviado  na requisicao
+    let foto = request.file
+    let result = await controllerPost.inserirNovoPost(dados, contentType, foto)
     response.status(result.status_code)
     response.json(result)
 })

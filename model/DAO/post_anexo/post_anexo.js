@@ -27,6 +27,11 @@ const insertNewPostAnexo = async function (post_anexo) {
             '${post_anexo.id_usuario}',
             '${post_anexo.id_anexo}',
         );`
+    let result = await knexConex.raw(sql)
+        if(result)
+            return true
+        else
+            return false
     } catch (error) {
         //console.log(error)
         return false
