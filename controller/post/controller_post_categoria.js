@@ -56,9 +56,9 @@ const atualizarPostCategoria = async function (postCategoria, id) {
                     //Chama a função do DAO para atualizar a categoria
                     let result = await postCategoriaDAO.updatePostCategoria(postCategoria)
                     if(result){
-                        message.DEFAULT_MESSAGE.status      = message.SUCESS_UPDATE_ITEM.status
-                        message.DEFAULT_MESSAGE.status_code = message.SUCESS_UPDATE_ITEM.status_code
-                        message.DEFAULT_MESSAGE.message     = message.SUCESS_UPDATE_ITEM.message
+                        message.DEFAULT_MESSAGE.status      = message.SUCCESS_UPDATE_ITEM.status
+                        message.DEFAULT_MESSAGE.status_code = message.SUCCESS_UPDATE_ITEM.status_code
+                        message.DEFAULT_MESSAGE.message     = message.SUCCESS_UPDATE_ITEM.message
                         message.DEFAULT_MESSAGE.response    = postCategoria
                         return message.DEFAULT_MESSAGE //200 (Atualizado)
                     }else

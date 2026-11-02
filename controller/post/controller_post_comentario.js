@@ -21,7 +21,6 @@ const inserirPostComentario = async function(postComentario) {
         if(validar)
             return validar //400
         else{
-            console.log("Estou aqui")
             let result = await postComentarioDAO.insertPostComentario(postComentario)
             if(result){
                 /*
@@ -34,7 +33,7 @@ const inserirPostComentario = async function(postComentario) {
                message.DEFAULT_MESSAGE.message      = message.SUCCESS_CREATED_ITEM.message
                message.DEFAULT_MESSAGE.response     = postComentario //201
             }else
-                message.ERROR_INTERNAL_SERVER_MODEL //500(banco de dados)
+                return message.ERROR_INTERNAL_SERVER_MODEL //500(banco de dados)
         }
         return message.DEFAULT_MESSAGE  //Retorno da mensagem do try
     } catch (error) {
@@ -58,9 +57,9 @@ const atualizarPostComentario = async function (postComentario, id) {
                     //Chama a função do DAO para atualizar a categoria
                     let result = await postComentarioDAO.updatePostComentario(postComentario)
                     if(result){
-                        message.DEFAULT_MESSAGE.status      = message.SUCESS_UPDATE_ITEM.status
-                        message.DEFAULT_MESSAGE.status_code = message.SUCESS_UPDATE_ITEM.status_code
-                        message.DEFAULT_MESSAGE.message     = message.SUCESS_UPDATE_ITEM.message
+                        message.DEFAULT_MESSAGE.status      = message.SUCCESS_UPDATE_ITEM.status
+                        message.DEFAULT_MESSAGE.status_code = message.SUCCESS_UPDATE_ITEM.status_code
+                        message.DEFAULT_MESSAGE.message     = message.SUCCESS_UPDATE_ITEM.message
                         message.DEFAULT_MESSAGE.response    = postComentario
                         return message.DEFAULT_MESSAGE //200 (Atualizado)
                     }else
@@ -70,6 +69,7 @@ const atualizarPostComentario = async function (postComentario, id) {
             }else
                return resultBuscarID //404, 400, 500 (resultBuscarId)
     } catch (error) {
+        //console.log(error)
         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
     }
 }
@@ -170,9 +170,9 @@ const excluirPostComentario = async function (id) {
         if(resultBuscarID.status){
             let result = await postComentarioDAO.deletePostComentario(id)
             if(result){
-                message.DEFAULT_MESSAGE.status      = message.SUCESS_DELETE_ITEM.status
-                message.DEFAULT_MESSAGE.status_code = message.SUCESS_DELETE_ITEM.status_code
-                message.DEFAULT_MESSAGE.message     = message.SUCESS_DELETE_ITEM.message
+                message.DEFAULT_MESSAGE.status      = message.SUCCESS_DELETED_ITEM.status
+                message.DEFAULT_MESSAGE.status_code = message.SUCCESS_DELETED_ITEM.status_code
+                message.DEFAULT_MESSAGE.message     = message.SUCCESS_DELETED_ITEM.message
                 
                 return message.DEFAULT_MESSAGE
             }else{

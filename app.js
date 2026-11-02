@@ -90,6 +90,46 @@ app.post('/v1/senai/vibeEco/postComentario', bodyParserJson, async function(requ
     response.json(result)
 })
 
+app.get('/v1/senai/vibeEco/postComentarioIdUsuario/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerPostComentario.buscarPostComentarioIdUsuario(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.get('/v1/senai/vibeEco/postComentarioIdPost/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerPostComentario.buscarPostComentarioIdPost(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.get('/v1/senai/vibeEco/postComentario/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerPostComentario.buscarPostComentario(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.put('/v1/senai/vibeEco/postComentario/:id', bodyParserJson, async function (request, response) {
+    //Recebe o content-type da requisição
+    let contentType = request.headers['content-type']
+    //Recebe o id a ser atualizado
+    let id = request.params.id
+    //Recebe os dados enviados no corpo da requisição
+    let dados = request.body
+    let result = await controllerPostComentario.atualizarPostComentario(dados, id, contentType)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.delete('/v1/senai/vibeEco/postComentario/:id', bodyParserJson, async function (request, response) {
+    let id      = request.params.id
+    let result  = await controllerPostComentario.excluirPostComentario(id)
+    response.status(result.status_code)
+    response.json(result) 
+})
+
 
 //iniciando uma API para receber requisições
 app.listen(8080, function(){ //decidindo a porta para saída do conteúdo

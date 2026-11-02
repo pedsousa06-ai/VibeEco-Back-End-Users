@@ -15,6 +15,7 @@ const postDAO = require('../../model/DAO/post/post.js')
 //Import das controllers
 const controller_post_categoria  = require('./controller_post_categoria.js')
 const controller_post_comentario  = require('./controller_post_comentario.js')
+const controller_post_anexo  = require('./controller_post_anexo.js')
 
 //Criar
 const inserirNovoPost = async function(post, contentType) {
@@ -43,6 +44,19 @@ const inserirNovoPost = async function(post, contentType) {
                     //Chama a controller do filme_genero para inserir os IDs
                     let resultInsertCategoria = await controller_post_categoria.inserirNovoPostCategoria(postCategoria)
                     if(!resultInsertCategoria)
+                        return message.SUCCESS_CREATED_ITEM_WARNING //201 (ok, porém com WARNING)
+                }
+
+                //Manipulação de dados para inserir os gêneros do filme
+                for(anexo of post.anexo){
+                    //Cria o objeto JSON com o id do filme e o id do gênero
+                    let postAnexo = {
+                        "id_post": post.id,
+                        "id_anexo": anexo.id
+                    }
+                    //Chama a controller do filme_genero para inserir os IDs
+                    let resultPostAnexo = await controller_post_anexo.inserirNovoPostAnexo(postAnexo)
+                    if(!resultPostAnexo)
                         return message.SUCCESS_CREATED_ITEM_WARNING //201 (ok, porém com WARNING)
                 }
                message.DEFAULT_MESSAGE.status       = message.SUCCESS_CREATED_ITEM.status
@@ -95,6 +109,24 @@ const atualizarPost = async function (post, id, contentype) {
                             }
                         }
 
+                        //Manipulação de dados na tabela de relação entre post e categoria
+                        let resultDeleteAnexo = await controller_post_anexo.excluirAnexosIdPost(post.id)
+                        //Após a exclusão de todos as categorias com o post
+                        if(resultDeleteAnexo.status){
+                            //Manipulação de dados para inserir as categorias do post
+                            for(anexo of post.anexo){
+                                //Cria o objeto JSON com o id do filme e o id do gênero
+                                let postAnexo = {
+                                "id_post": post.id,
+                                "id_anexo": anexo.id
+                                }
+                                //Chama a controller do post_categoria para inserir os IDs
+                                let resultInsertAnexo = await controller_post_anexo.inserirNovoPostAnexo(postAnexo)
+                                if(!resultInsertAnexo)
+                                    return message.SUCCESS_CREATED_ITEM_WARNING //201 (ok, porém com WARNING)
+                            }
+                        }
+
                         message.DEFAULT_MESSAGE.status      = message.SUCCESS_UPDATE_ITEM.status
                         message.DEFAULT_MESSAGE.status_code = message.SUCCESS_UPDATE_ITEM.status_code
                         message.DEFAULT_MESSAGE.message     = message.SUCCESS_UPDATE_ITEM.message
@@ -110,7 +142,7 @@ const atualizarPost = async function (post, id, contentype) {
         }else
             return message.DEFAULT_MESSAGE.ERROR_CONTENT_TYPE //415(contentType)
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
     }
 }   
@@ -133,9 +165,16 @@ const listarPost = async function () {
             }
             for(post of result){
                 //Cria o objeto de categorias relacionados ao post
-                let resultComentario = await controller_post_comentario.buscarPostComentario(post.id)
+                let resultComentario = await controller_post_comentario.buscarPostComentarioIdPost(post.id)
                 if(resultComentario.status){
                     post.comentario = resultComentario.response.post_comentario
+                }
+            }
+            for(post of result){
+                //Cria o objeto de categorias relacionados ao post
+                let resultAnexo = await controller_post_anexo.buscarAnexosIdPost(post.id)
+                if(resultAnexo.status){
+                    post.anexo = resultAnexo.response.post_anexo
                 }
             }
             //Validação para verificar se existe conteúdo no array
@@ -171,9 +210,16 @@ const listarPostRelevantes = async function () {
                 }
                 for(post of result){
                     //Cria o objeto de categorias relacionados ao post
-                    let resultComentario = await controller_post_comentario.buscarPostComentario(post.id)
+                    let resultComentario = await controller_post_comentario.buscarPostComentarioIdPost(post.id)
                     if(resultComentario.status){
                         post.comentario = resultComentario.response.post_comentario
+                    }
+                }
+                for(post of result){
+                    //Cria o objeto de categorias relacionados ao post
+                    let resultAnexo = await controller_post_anexo.buscarAnexosIdPost(post.id)
+                    if(resultAnexo.status){
+                        post.anexo = resultAnexo.response.post_anexo
                     }
                 }
                 if(result.length > 0){
@@ -214,9 +260,16 @@ const buscarPost = async function (id) {
                     }
                     for(post of result){
                         //Cria o objeto de categorias relacionados ao post
-                        let resultComentario = await controller_post_comentario.buscarPostComentario(post.id)
+                        let resultComentario = await controller_post_comentario.buscarPostComentarioIdPost(post.id)
                         if(resultComentario.status){
                             post.comentario = resultComentario.response.post_comentario
+                        }
+                    }
+                    for(post of result){
+                        //Cria o objeto de categorias relacionados ao post
+                        let resultAnexo = await controller_post_anexo.buscarAnexosIdPost(post.id)
+                        if(resultAnexo.status){
+                            post.anexo = resultAnexo.response.post_anexo
                         }
                     }
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status

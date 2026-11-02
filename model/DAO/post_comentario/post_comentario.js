@@ -30,9 +30,14 @@ const insertPostComentario = async function (post_comentario) {
             '${post_comentario.id_post}',
             '${post_comentario.comentario}',
             now()
-    );`
+        );`
+        let result = await knexConex.raw(sql)
+        if (result)
+            return result[0].insertId
+        else
+            return false
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         return false
     }
 }
@@ -47,8 +52,9 @@ const updatePostComentario = async function (post_comentario) {
         where id        =   ${post_comentario.id};`
 
         let result = await knexConex.raw(sql)
-        if (result)
+        if (result){
             return true
+        }
         else
             return false
     } catch (error) {
@@ -64,7 +70,7 @@ const selectPostComentarioByIdPost = async function (id) {
         let sql = `call procListarComentariosByIdPost(${id})`
         let result = await knexConex.raw(sql)
         if (Array.isArray(result)) {
-            return result[0]
+            return result[0][0]
         } else
             return false
     } catch (error) {
@@ -79,7 +85,7 @@ const selectPostComentarioByIdUsuario = async function (id_usuario) {
         let sql = `call procListarComentariosByIdUsuario(${id_usuario});`
         let result = await knexConex.raw(sql)
         if (Array.isArray(result)) {
-            return result[0]
+            return result[0][0]
         } else
             return false
     } catch (error) {
