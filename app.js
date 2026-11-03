@@ -23,6 +23,7 @@ const upload        = multer()
 //Import das controllers do projeto
 const controllerPost = require('./controller/post/controller_post.js')
 const controllerPostComentario = require('./controller/post/controller_post_comentario.js')
+const controllerPostCurtida = require('./controller/post/controller_post_curtida.js')
 
 //criando um objeto para manipular dados do body da API em formato Json
 const bodyParserJson = bodyParser.json()
@@ -149,6 +150,42 @@ app.delete('/v1/senai/vibeEco/postComentario/:id', bodyParserJson, async functio
     response.json(result) 
 })
 
+app.post('/v1/senai/vibeEco/postCurtida', bodyParserJson, async function(request, response){
+    //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
+    let dados = request.body
+    let contentType = request.headers['content-type']
+    let result = await controllerPostCurtida.inserirPostCurtida(dados, contentType)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.get('/v1/senai/vibeEco/postCurtidaoIdUsuario/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerPostCurtida.buscarPostCurtidaIdUsuario(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.get('/v1/senai/vibeEco/postCurtidaIdPost/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerPostCurtida.buscarPostCurtidaIdPost(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.get('/v1/senai/vibeEco/postCurtida/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerPostCurtida.buscarPostCurtida(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.delete('/v1/senai/vibeEco/postCurtida/:id', bodyParserJson, async function (request, response) {
+    let id      = request.params.id
+    let result  = await controllerPostCurtida.excluirPostCurtida(id)
+    response.status(result.status_code)
+    response.json(result) 
+})
 
 //iniciando uma API para receber requisições
 app.listen(8080, function(){ //decidindo a porta para saída do conteúdo

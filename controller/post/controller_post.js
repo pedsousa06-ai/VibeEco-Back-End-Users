@@ -142,8 +142,17 @@ const atualizarPost = async function (post, id, contentype) {
     //Criando um clone do objeto JSON para manipular sua estrutura sem modificar o arquivo original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
+        // CORREÇÃO: Se a categoria vier como string do form-data, converte para array/objeto real
+        if (typeof post.categoria === 'string') {
+            try {
+                post.categoria = JSON.parse(post.categoria)
+            } catch (error) {
+                message.ERROR_BAD_REQUEST.field = '[CATEGORIA] INVÁLIDA (Formato JSON incorreto)'
+                return message.ERROR_BAD_REQUEST
+            }
+        }
         //Validação do contentType para receber formato de dados em JSON
-        if(String(contentype).toUpperCase() == 'APPLICATION/JSON'){
+        if(type.includes('APPLICATION/JSON') || type.includes('MULTIPART/FORM-DATA')){
             let resultBuscarID = await buscarPost(id)
             if(resultBuscarID.status){
                 //Validação de campos obrigatórios para atualização (body)

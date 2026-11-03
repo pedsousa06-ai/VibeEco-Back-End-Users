@@ -1,5 +1,5 @@
 //Criação das constantes de configuração da azure
-const TOKEN         =   'sp=racw&st=2026-11-02T19:16:54Z&se=2026-11-03T03:31:54Z&sv=2026-02-06&sr=c&sig=21gCNof%2BrDBzOahAI6AOqZX3j5ZrZg7R328JzfVviWU%3D'
+const TOKEN         =   'sp=racwd&st=2026-11-03T12:59:07Z&se=2026-11-10T21:14:07Z&sv=2026-02-06&sr=c&sig=InO4BE8UDGSMvOE4Z%2BSH%2BmmSaFlPjCm5aZaEg4n0HBw%3D'
 const ACCOUNT       =   'uploadarquivospost'
 const CONTAINER     =   'uploadarquivospost'
 
