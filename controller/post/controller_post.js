@@ -138,87 +138,196 @@ const inserirNovoPost = async function(post, contentType, arquivos = []) {
 }
 
 //Atualizar
-const atualizarPost = async function (post, id, contentype) {
+// const atualizarPost = async function (post, id, contentype) {
+//     //Criando um clone do objeto JSON para manipular sua estrutura sem modificar o arquivo original
+//     let message = JSON.parse(JSON.stringify(config_message))
+//     try {
+//         // CORREÇÃO: Se a categoria vier como string do form-data, converte para array/objeto real
+//         if (typeof post.categoria === 'string') {
+//             try {
+//                 post.categoria = JSON.parse(post.categoria)
+//             } catch (error) {
+//                 message.ERROR_BAD_REQUEST.field = '[CATEGORIA] INVÁLIDA (Formato JSON incorreto)'
+//                 return message.ERROR_BAD_REQUEST
+//             }
+//         }
+//         //Validação do contentType para receber formato de dados em JSON
+//         if(type.includes('APPLICATION/JSON') || type.includes('MULTIPART/FORM-DATA')){
+//             let resultBuscarID = await buscarPost(id)
+//             if(resultBuscarID.status){
+//                 //Validação de campos obrigatórios para atualização (body)
+//                 let validar = await validarDados(post, contentype)
+//                 if(!validar){
+//                     //Adicionando o atributo ID do post no JSON para ser enviado ao DAO
+//                     post.id = id
+//                     //Chama a função do DAO para atualizar o post
+//                     let result = await postDAO.updatePost(post)
+//                     if(result){
+
+//                         //Manipulação de dados na tabela de relação entre post e categoria
+//                         let resultDeleteCategoria = await controller_post_categoria.excluirCategoriaIdPost(post.id)
+//                         //Após a exclusão de todos as categorias com o post
+//                         if(resultDeleteCategoria.status){
+//                             //Manipulação de dados para inserir as categorias do post
+//                             for(categoria of post.categoria){
+//                                 //Cria o objeto JSON com o id do filme e o id do gênero
+//                                 let postCategoria = {
+//                                 "id_post": post.id,
+//                                 "id_categoria": categoria.id
+//                                 }
+//                                 //Chama a controller do post_categoria para inserir os IDs
+//                                 let resultInsertCategoria = await controller_post_categoria.inserirNovoPostCategoria(postCategoria)
+//                                 if(!resultInsertCategoria)
+//                                     return message.SUCCESS_CREATED_ITEM_WARNING //201 (ok, porém com WARNING)
+//                             }
+//                         }
+
+//                         //Manipulação de dados na tabela de relação entre post e categoria
+//                         let resultDeleteAnexo = await controller_post_anexo.excluirAnexosIdPost(post.id)
+//                         //Após a exclusão de todos as categorias com o post
+//                         if(resultDeleteAnexo.status){
+//                             //Manipulação de dados para inserir as categorias do post
+//                             for(anexo of post.anexo){
+//                                 //Cria o objeto JSON com o id do filme e o id do gênero
+//                                 let postAnexo = {
+//                                 "id_post": post.id,
+//                                 "id_anexo": anexo.id
+//                                 }
+//                                 //Chama a controller do post_categoria para inserir os IDs
+//                                 let resultInsertAnexo = await controller_post_anexo.inserirNovoPostAnexo(postAnexo)
+//                                 if(!resultInsertAnexo)
+//                                     return message.SUCCESS_CREATED_ITEM_WARNING //201 (ok, porém com WARNING)
+//                             }
+//                         }
+
+//                         message.DEFAULT_MESSAGE.status      = message.SUCCESS_UPDATE_ITEM.status
+//                         message.DEFAULT_MESSAGE.status_code = message.SUCCESS_UPDATE_ITEM.status_code
+//                         message.DEFAULT_MESSAGE.message     = message.SUCCESS_UPDATE_ITEM.message
+//                         message.DEFAULT_MESSAGE.response    = post
+//                         return message.DEFAULT_MESSAGE //200 (Atualizado)
+//                     }else{
+//                         return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
+//                     }
+//                 }
+//             }else{
+//                return resultBuscarID //404, 400, 500 (resultBuscarId)
+//             }
+//         }else
+//             return message.DEFAULT_MESSAGE.ERROR_CONTENT_TYPE //415(contentType)
+//     } catch (error) {
+//         //console.log(error)
+//         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
+//     }
+// }   
+
+//Atualizar (apaga tudo o que existia no post e grava as novas informações)
+const atualizarPost = async function (post, id, contentType, arquivos = []) {
     //Criando um clone do objeto JSON para manipular sua estrutura sem modificar o arquivo original
     let message = JSON.parse(JSON.stringify(config_message))
+ 
+    //Lista dos anexos novos que já subiram (usada para desfazer caso algo falhe)
+    let anexosNovos = []
+ 
     try {
-        // CORREÇÃO: Se a categoria vier como string do form-data, converte para array/objeto real
+        //Validação do contentType (JSON ou form-data)
+        let type = String(contentType).toUpperCase()
+        if(!(type.includes('APPLICATION/JSON') || type.includes('MULTIPART/FORM-DATA')))
+            return message.ERROR_CONTENT_TYPE //415
+ 
+        //Se a categoria vier como string do form-data, converte para array/objeto real
         if (typeof post.categoria === 'string') {
             try {
                 post.categoria = JSON.parse(post.categoria)
             } catch (error) {
                 message.ERROR_BAD_REQUEST.field = '[CATEGORIA] INVÁLIDA (Formato JSON incorreto)'
-                return message.ERROR_BAD_REQUEST
+                return message.ERROR_BAD_REQUEST //400
             }
         }
-        //Validação do contentType para receber formato de dados em JSON
-        if(type.includes('APPLICATION/JSON') || type.includes('MULTIPART/FORM-DATA')){
-            let resultBuscarID = await buscarPost(id)
-            if(resultBuscarID.status){
-                //Validação de campos obrigatórios para atualização (body)
-                let validar = await validarDados(post, contentype)
-                if(!validar){
-                    //Adicionando o atributo ID do post no JSON para ser enviado ao DAO
-                    post.id = id
-                    //Chama a função do DAO para atualizar o post
-                    let result = await postDAO.updatePost(post)
-                    if(result){
-
-                        //Manipulação de dados na tabela de relação entre post e categoria
-                        let resultDeleteCategoria = await controller_post_categoria.excluirCategoriaIdPost(post.id)
-                        //Após a exclusão de todos as categorias com o post
-                        if(resultDeleteCategoria.status){
-                            //Manipulação de dados para inserir as categorias do post
-                            for(categoria of post.categoria){
-                                //Cria o objeto JSON com o id do filme e o id do gênero
-                                let postCategoria = {
-                                "id_post": post.id,
-                                "id_categoria": categoria.id
-                                }
-                                //Chama a controller do post_categoria para inserir os IDs
-                                let resultInsertCategoria = await controller_post_categoria.inserirNovoPostCategoria(postCategoria)
-                                if(!resultInsertCategoria)
-                                    return message.SUCCESS_CREATED_ITEM_WARNING //201 (ok, porém com WARNING)
-                            }
-                        }
-
-                        //Manipulação de dados na tabela de relação entre post e categoria
-                        let resultDeleteAnexo = await controller_post_anexo.excluirAnexosIdPost(post.id)
-                        //Após a exclusão de todos as categorias com o post
-                        if(resultDeleteAnexo.status){
-                            //Manipulação de dados para inserir as categorias do post
-                            for(anexo of post.anexo){
-                                //Cria o objeto JSON com o id do filme e o id do gênero
-                                let postAnexo = {
-                                "id_post": post.id,
-                                "id_anexo": anexo.id
-                                }
-                                //Chama a controller do post_categoria para inserir os IDs
-                                let resultInsertAnexo = await controller_post_anexo.inserirNovoPostAnexo(postAnexo)
-                                if(!resultInsertAnexo)
-                                    return message.SUCCESS_CREATED_ITEM_WARNING //201 (ok, porém com WARNING)
-                            }
-                        }
-
-                        message.DEFAULT_MESSAGE.status      = message.SUCCESS_UPDATE_ITEM.status
-                        message.DEFAULT_MESSAGE.status_code = message.SUCCESS_UPDATE_ITEM.status_code
-                        message.DEFAULT_MESSAGE.message     = message.SUCCESS_UPDATE_ITEM.message
-                        message.DEFAULT_MESSAGE.response    = post
-                        return message.DEFAULT_MESSAGE //200 (Atualizado)
-                    }else{
-                        return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
-                    }
-                }
-            }else{
-               return resultBuscarID //404, 400, 500 (resultBuscarId)
+ 
+        //Validação dos campos obrigatórios (body)
+        let validar = await validarDados(post, contentType)
+        if(validar)
+            return validar //400
+ 
+        //O post existe?
+        let resultBuscarID = await buscarPost(id)
+        if(!resultBuscarID.status)
+            return resultBuscarID //404, 400, 500
+ 
+        //Guarda os anexos ANTIGOS (precisa do id_anexo e do endereco_url de cada um)
+        let anexosAntigos = []
+        let resultAnexosAntigos = await controller_post_anexo.buscarAnexosIdPost(id)
+        if(resultAnexosAntigos.status)
+            anexosAntigos = resultAnexosAntigos.response.post_anexo
+ 
+        //1. Sobe os anexos NOVOS (Azure + tbl_anexo) antes de apagar qualquer coisa
+        for(const arquivo of arquivos){
+            let resultAnexo = await controller_anexo.inserirNovoAnexo(contentType, { nome: arquivo.originalname }, arquivo)
+            if(!resultAnexo.status){
+                //Falhou: desfaz os anexos novos que já tinham subido e mantém o post como estava
+                for(const novo of anexosNovos)
+                    await controller_anexo.excluirAnexo(novo.id)
+                return message.ERROR_INTERNAL_SERVER_CONTROLLER //500
             }
-        }else
-            return message.DEFAULT_MESSAGE.ERROR_CONTENT_TYPE //415(contentType)
+            anexosNovos.push(resultAnexo.response)
+        }
+ 
+        //2. Atualiza os dados do post
+        post.id = id
+        let result = await postDAO.updatePost(post)
+        if(!result){
+            for(const novo of anexosNovos)
+                await controller_anexo.excluirAnexo(novo.id)
+            return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
+        }
+ 
+        //3. Categorias: apaga as relações antigas e cria as novas
+        let resultDeleteCategoria = await controller_post_categoria.excluirCategoriaIdPost(post.id)
+        if(!resultDeleteCategoria.status)
+            return message.SUCCESS_CREATED_ITEM_WARNING //201 (ok, porém com WARNING)
+ 
+        if(Array.isArray(post.categoria)){
+            for(const categoria of post.categoria){
+                let resultInsertCategoria = await controller_post_categoria.inserirNovoPostCategoria({
+                    id_post: post.id,
+                    id_categoria: categoria.id
+                })
+                if(!resultInsertCategoria.status)
+                    return message.SUCCESS_CREATED_ITEM_WARNING
+            }
+        }
+ 
+        //4. Anexos: apaga as relações antigas (tbl_post_anexo) e cria as novas
+        let resultDeleteAnexo = await controller_post_anexo.excluirAnexosIdPost(post.id)
+        if(!resultDeleteAnexo.status)
+            return message.SUCCESS_CREATED_ITEM_WARNING
+ 
+        for(const anexo of anexosNovos){
+            let resultInsertAnexo = await controller_post_anexo.inserirNovoPostAnexo({
+                id_post: post.id,
+                id_anexo: anexo.id
+            })
+            if(!resultInsertAnexo.status)
+                return message.SUCCESS_CREATED_ITEM_WARNING
+        }
+ 
+        //5. Só agora apaga os anexos ANTIGOS (a relação já foi removida no passo 4)
+        //O excluirAnexo apaga a linha da tbl_anexo e o arquivo no Azure
+        for(const antigo of anexosAntigos)
+            await controller_anexo.excluirAnexo(antigo.id_anexo)
+ 
+        post.anexo = anexosNovos
+        message.DEFAULT_MESSAGE.status      = message.SUCCESS_UPDATE_ITEM.status
+        message.DEFAULT_MESSAGE.status_code = message.SUCCESS_UPDATE_ITEM.status_code
+        message.DEFAULT_MESSAGE.message     = message.SUCCESS_UPDATE_ITEM.message
+        message.DEFAULT_MESSAGE.response    = post
+        return message.DEFAULT_MESSAGE //200 (Atualizado)
+ 
     } catch (error) {
-        //console.log(error)
+        console.log(error)
         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
     }
-}   
+}
 
 //Ler os posts mais recentes
 const listarPost = async function () {

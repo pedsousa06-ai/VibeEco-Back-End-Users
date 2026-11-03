@@ -77,51 +77,120 @@ const inserirNovoAnexo = async function(contentType, anexo, foto){
 }
 
 //função para atualizar um dado
+// const atualizarAnexo = async function(id, contentType, anexo, foto){
+
+//     let message = JSON.parse(JSON.stringify(config_message))
+
+//     try {
+//         //verificando existencia do id
+//         let validarId = await buscarAnexoId(id)
+
+//         if(validarId.status){
+
+//             //verificando tipo de dados
+//             if(contentType){
+
+//                 //validar dados
+//                 let validarDados = await validarDadosAnexo(anexo)
+
+//                 if(!validarDados){
+
+//                     // Enviando a foto para fazer o upload do arquivo
+//                     let urlFoto = await UPLOAD.uploadFiles(foto)
+
+//                     if(urlFoto){
+
+//                         // Adicionando a url no objeto usuario
+//                         anexo.endereco_url = urlFoto
+
+//                         //se estiver tudo certo ele adiciona o id no objeto
+//                         anexo.id = Number(id)
+        
+//                         //enviando para o banco 
+//                         let result = await anexoDAO.updateAnexo(anexo)
+
+//                         if(result){
+
+//                             message.DEFAULT_MESSAGE.status = message.SUCCESS_UPDATE_ITEM.status
+//                             message.DEFAULT_MESSAGE.status_code = message.SUCCESS_UPDATE_ITEM.status_code
+//                             message.DEFAULT_MESSAGE.message = message.SUCCESS_UPDATE_ITEM.message
+//                             message.DEFAULT_MESSAGE.response = anexo //envia os dados no response, para o usuário visualizar
+
+//                             return message.DEFAULT_MESSAGE //200
+//                         }else{
+//                             return message.ERROR_INTERNAL_SERVER_MODEL
+//                         }
+
+
+//                     }else{
+//                         console.log("Erro ao enviar a foto")
+//                         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (erro no controller)
+//                     }
+    
+//                 }else{
+//                     return validarDados //mensagem de erro da própria função
+//                 }
+//             }else{
+//                 return message.ERROR_CONTENT_TYPE
+//             }
+
+//         }else{
+//             return validarId //mensagem de erro da própria função
+//         }
+        
+//     } catch (error) {
+//         console.log(error)
+//         return message.ERROR_INTERNAL_SERVER_CONTROLLER
+//     }
+
+// }
+
+//função para atualizar um dado
 const atualizarAnexo = async function(id, contentType, anexo, foto){
-
+ 
     let message = JSON.parse(JSON.stringify(config_message))
-
+ 
     try {
         //verificando existencia do id
         let validarId = await buscarAnexoId(id)
-
+ 
         if(validarId.status){
-
+ 
             //verificando tipo de dados
             if(contentType){
-
+ 
                 //validar dados
                 let validarDados = await validarDadosAnexo(anexo)
-
+ 
                 if(!validarDados){
-
+ 
                     // Enviando a foto para fazer o upload do arquivo
                     let urlFoto = await UPLOAD.uploadFiles(foto)
-
+ 
                     if(urlFoto){
-
+ 
                         // Adicionando a url no objeto usuario
                         anexo.endereco_url = urlFoto
-
+ 
                         //se estiver tudo certo ele adiciona o id no objeto
                         anexo.id = Number(id)
         
                         //enviando para o banco 
                         let result = await anexoDAO.updateAnexo(anexo)
-
+ 
                         if(result){
-
+ 
                             message.DEFAULT_MESSAGE.status = message.SUCCESS_UPDATE_ITEM.status
                             message.DEFAULT_MESSAGE.status_code = message.SUCCESS_UPDATE_ITEM.status_code
                             message.DEFAULT_MESSAGE.message = message.SUCCESS_UPDATE_ITEM.message
                             message.DEFAULT_MESSAGE.response = anexo //envia os dados no response, para o usuário visualizar
-
+ 
                             return message.DEFAULT_MESSAGE //200
                         }else{
                             return message.ERROR_INTERNAL_SERVER_MODEL
                         }
-
-
+ 
+ 
                     }else{
                         console.log("Erro ao enviar a foto")
                         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (erro no controller)
@@ -133,7 +202,7 @@ const atualizarAnexo = async function(id, contentType, anexo, foto){
             }else{
                 return message.ERROR_CONTENT_TYPE
             }
-
+ 
         }else{
             return validarId //mensagem de erro da própria função
         }
@@ -142,7 +211,7 @@ const atualizarAnexo = async function(id, contentType, anexo, foto){
         console.log(error)
         return message.ERROR_INTERNAL_SERVER_CONTROLLER
     }
-
+ 
 }
 
 //função para retornar todos os dados

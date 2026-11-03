@@ -32,10 +32,10 @@ const inserirNovoPostAnexo = async function(postAnexo) {
                message.DEFAULT_MESSAGE.status_code  = message.SUCCESS_CREATED_ITEM.status_code
                message.DEFAULT_MESSAGE.message      = message.SUCCESS_CREATED_ITEM.message
                message.DEFAULT_MESSAGE.response     = postAnexo //201
+               return message.DEFAULT_MESSAGE  //Retorno da mensagem do try
             }else
-                message.ERROR_INTERNAL_SERVER_MODEL //500(banco de dados)
+               return message.ERROR_INTERNAL_SERVER_MODEL //500(banco de dados)
         }
-        return message.DEFAULT_MESSAGE  //Retorno da mensagem do try
     } catch (error) {
         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500(controller)
     }

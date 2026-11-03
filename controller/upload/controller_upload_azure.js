@@ -92,4 +92,4 @@ const deleteFile = async function (urlFile) {
     }
 }
 
-module.exports = {uploadFiles}
+module.exports = {uploadFiles, deleteFile}
