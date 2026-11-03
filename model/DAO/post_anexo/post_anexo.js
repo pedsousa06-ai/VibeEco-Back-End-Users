@@ -21,11 +21,11 @@ const knexConex = knex(knexConfig.development)
 const insertNewPostAnexo = async function (post_anexo) {
     try {
         let sql = `insert into tbl_post_anexo (
-            id_usuario,
-            id_anexo,
+            id_post,
+            id_anexo
         )values(
-            '${post_anexo.id_usuario}',
-            '${post_anexo.id_anexo}',
+            '${post_anexo.id_post}',
+            '${post_anexo.id_anexo}'
         );`
     let result = await knexConex.raw(sql)
         if(result)

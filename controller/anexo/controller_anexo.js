@@ -47,9 +47,9 @@ const inserirNovoAnexo = async function(contentType, anexo, foto){
     
                         anexo.id = result //criando o atributo ID no Json e colocando o ID gerado no momento do insert
     
-                        message.DEFAULT_MESSAGE.status = message.SUCESS_CREATED_ITEM.status //cria um atributo de status no cabeçalho "DEFAULT_MESSAGE" e atribui um valor predefinido no "SUCESS_CHEATED_ITEM"
-                        message.DEFAULT_MESSAGE.status_code = message.SUCESS_CREATED_ITEM.status_code
-                        message.DEFAULT_MESSAGE.message = message.SUCESS_CREATED_ITEM.message
+                        message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status //cria um atributo de status no cabeçalho "DEFAULT_MESSAGE" e atribui um valor predefinido no "SUCESS_CHEATED_ITEM"
+                        message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
+                        message.DEFAULT_MESSAGE.message = message.SUCCESS_CREATED_ITEM.message
                         message.DEFAULT_MESSAGE.response = anexo //aparece os dados do ator do response para o usuário conferir
     
                         return message.DEFAULT_MESSAGE //200 (retorna o cabeçalho com a mensagem de sucesso e os dados)

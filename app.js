@@ -41,13 +41,20 @@ const corsOption = {
 app.use(cors(corsOption))
 
 //EndPoints
-app.post('/v1/senai/vibeEco/post', bodyParserJson, upload.single(anexo), async function(request, response){
-    //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
+app.post('/v1/senai/vibeEco/post', upload.array('anexos',5), async function(request, response){
+
     let dados = request.body
     let contentType = request.headers['content-type']
-    //Recebe o arquivo de imagem enviado  na requisicao
-    let foto = request.file
-    let result = await controllerPost.inserirNovoPost(dados, contentType, foto)
+
+    // Recebe os arquivos enviados na requisicao
+    let arquivos = request.files
+
+    let result = await controllerPost.inserirNovoPost(
+        dados,
+        contentType,
+        arquivos
+    )
+
     response.status(result.status_code)
     response.json(result)
 })

@@ -2,7 +2,7 @@
 const AZURE = require("../modulo/config_upload_azure")
 //Import da dependencia para realizar uma requisição HTTP pelo node
 //const fetch = require('node-fetch').default
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args))
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const uploadFiles = async function (file) {
     //Concatena no nome do arquivo a data e a hora
