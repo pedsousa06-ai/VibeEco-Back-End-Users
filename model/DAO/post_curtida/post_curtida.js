@@ -74,7 +74,7 @@ const selectPostCurtidaByIdUsuario = async function (id_usuario) {
 const selectByIdPostCurtida = async function (id) {
     try {
         //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarCurtidasByIdpostCurtidas(${id});`
+        let sql = `call procListarCurtidasByIdPostCurtida(${id});`
         let result = await knexConex.raw(sql)
         if (Array.isArray(result)) {
             return result[0][0]
@@ -86,9 +86,11 @@ const selectByIdPostCurtida = async function (id) {
 }
 
 //Delete
-const deletePostCurtida = async function (id) {
+const deletePostCurtidaByIdPostIdUsuario = async function (postCurtida) {
     try {
-        let sql = `delete from tbl_post_curtida where id = ${id};`
+        let sql = `delete from tbl_post_curtida 
+                        where id_post =         ${postCurtida.id_post} 
+                            and id_usuario =    ${postCurtida.id_usuario}`
         let result = await knexConex.raw(sql)
         if (result) {
             return true
@@ -104,5 +106,5 @@ module.exports = {
     selectByIdPostCurtida,
     selectPostCurtidaByIdPost,
     selectPostCurtidaByIdUsuario,
-    deletePostCurtida
+    deletePostCurtidaByIdPostIdUsuario
 }

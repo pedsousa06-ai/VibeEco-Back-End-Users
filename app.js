@@ -159,7 +159,7 @@ app.post('/v1/senai/vibeEco/postCurtida', bodyParserJson, async function(request
     response.json(result)
 })
 
-app.get('/v1/senai/vibeEco/postCurtidaoIdUsuario/:id', async function(request, response){
+app.get('/v1/senai/vibeEco/postCurtidaIdUsuario/:id', async function(request, response){
     let id = request.params.id
     let result = await controllerPostCurtida.buscarPostCurtidaIdUsuario(id)
     response.status(result.status_code)
@@ -180,11 +180,13 @@ app.get('/v1/senai/vibeEco/postCurtida/:id', async function(request, response){
     response.json(result)
 })
 
-app.delete('/v1/senai/vibeEco/postCurtida/:id', bodyParserJson, async function (request, response) {
-    let id      = request.params.id
-    let result  = await controllerPostCurtida.excluirPostCurtida(id)
+app.delete('/v1/senai/vibeEco/postCurtida', bodyParserJson, async function (request, response) {
+    //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
+    let dados = request.body
+    let contentType = request.headers['content-type']
+    let result = await controllerPostCurtida.excluirPostCurtidaByIDPostIdUsuario(dados, contentType)
     response.status(result.status_code)
-    response.json(result) 
+    response.json(result)
 })
 
 //iniciando uma API para receber requisições

@@ -13,29 +13,34 @@ const config_message = require('../modulo/configMessages.js')
 const postCurtidaDAO = require('../../model/DAO/post_curtida/post_curtida.js')
 
 //Criar
-const inserirPostCurtida = async function(postCurtida) {
+const inserirPostCurtida = async function(postCurtida, contentType) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
-        let validar = await validarDados(postCurtida)
-        if(validar)
-            return validar //400
-        else{
-            let result = await postCurtidaDAO.insertPostCurtida(postCurtida)
-            if(result){
-                /*
-                    Criando o atributo ID no JSON do comentario e colocando
-                    o ID gerado após o insert
-                */
-               postCurtida.id = result
-               message.DEFAULT_MESSAGE.status       = message.SUCCESS_CREATED_ITEM.status
-               message.DEFAULT_MESSAGE.status_code  = message.SUCCESS_CREATED_ITEM.status_code
-               message.DEFAULT_MESSAGE.message      = message.SUCCESS_CREATED_ITEM.message
-               message.DEFAULT_MESSAGE.response     = postCurtida //201
-            }else
-                return message.ERROR_INTERNAL_SERVER_MODEL //500(banco de dados)
-        }
-        return message.DEFAULT_MESSAGE  //Retorno da mensagem do try
+        //validando content type
+        if(String(contentType).toUpperCase() == "APPLICATION/JSON"){
+            let validar = await validarDados(postCurtida)
+            if(validar)
+                return validar //400
+            else{
+                let result = await postCurtidaDAO.insertPostCurtida(postCurtida)
+                if(result){
+                    /*
+                        Criando o atributo ID no JSON do comentario e colocando
+                        o ID gerado após o insert
+                    */
+                postCurtida.id = result
+                message.DEFAULT_MESSAGE.status       = message.SUCCESS_CREATED_ITEM.status
+                message.DEFAULT_MESSAGE.status_code  = message.SUCCESS_CREATED_ITEM.status_code
+                message.DEFAULT_MESSAGE.message      = message.SUCCESS_CREATED_ITEM.message
+                message.DEFAULT_MESSAGE.response     = postCurtida //201
+                return message.DEFAULT_MESSAGE  //Retorno da mensagem do try
+                }else
+                    return message.ERROR_INTERNAL_SERVER_MODEL //500(banco de dados)
+            }
+        }else
+            return message.ERROR_CONTENT_TYPE //415 (retorna erro de tipo de dados) 
+
     } catch (error) {
         //console.log(error)
         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500(controller)
@@ -130,27 +135,27 @@ const buscarPostCurtidaIdPost = async function (idPost) {
 }
 
 //Excluir
-const excluirPostCurtida = async function (id) {
-    //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar o arquivo original
+const excluirPostCurtidaByIDPostIdUsuario = async function (postCurtida, contentType) {
     let message = JSON.parse(JSON.stringify(config_message))
     try {
-        let resultBuscarID = await buscarPostCurtida(id)
-        if(resultBuscarID.status){
-            let result = await postCurtidaDAO.deletePostCurtida(id)
-            if(result){
+        //validando content type
+        if(String(contentType).toUpperCase() == "APPLICATION/JSON"){
+            let validar = await validarDados(postCurtida)
+            if (validar)
+                return validar //400
+            let result = await postCurtidaDAO.deletePostCurtidaByIdPostIdUsuario(postCurtida)
+            if (result) {
                 message.DEFAULT_MESSAGE.status      = message.SUCCESS_DELETED_ITEM.status
                 message.DEFAULT_MESSAGE.status_code = message.SUCCESS_DELETED_ITEM.status_code
                 message.DEFAULT_MESSAGE.message     = message.SUCCESS_DELETED_ITEM.message
-                
                 return message.DEFAULT_MESSAGE
-            }else{
-                return message.ERROR_INTERNAL_SERVER_MODEL //500
+            } else {
+                return message.ERROR_NOT_FOUND //404 (não existia curtida desse usuário nesse post)
             }
-        }else{
-            return resultBuscarID //404 (not found), 400 (error bad request), 500 (data base), 500 (controller) 
-        }
+        }else
+            return message.ERROR_CONTENT_TYPE //415 (retorna erro de tipo de dados) 
     } catch (error) {
-        return message.DEFAULT_MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
 
@@ -176,5 +181,5 @@ module.exports = {
     buscarPostCurtida,
     buscarPostCurtidaIdPost,
     buscarPostCurtidaIdUsuario,
-    excluirPostCurtida,
+    excluirPostCurtidaByIDPostIdUsuario
 }
