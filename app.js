@@ -94,9 +94,13 @@ app.get('/v1/senai/vibeEco/post/:id', async function(request, response){
 //     response.json(result)
 // })
 
-app.put('/v1/senai/vibeEco/post/:id', upload.array('anexos'), async function (request, response) {
+app.put('/v1/senai/vibeEco/post/:id', upload.array('anexos',5), async function (request, response) {
+    let dados = request.body
     let contentType = request.headers['content-type']
-    let result = await controllerPost.atualizarPost(request.body, request.params.id, contentType, request.files)
+    let id = request.params.id
+    // Recebe os arquivos enviados na requisicao
+    let arquivos = request.files
+    let result = await controllerPost.atualizarPost(dados, id, contentType, arquivos)
 
     response.status(result.status_code)
     response.json(result)

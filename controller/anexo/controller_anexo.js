@@ -248,7 +248,6 @@ const listarAnexo = async function(){
 
 //função para bucar um dado pelo id
 const buscarAnexoId = async function(id){
-
     let message = JSON.parse(JSON.stringify(config_message))
 
     try {
@@ -261,19 +260,17 @@ const buscarAnexoId = async function(id){
         
         //se o id estiver no formato correto ele ennvia pro DAO
         }else{
-            
             //enviando para o banco
             let result = await anexoDAO.selectByIdAnexo(id)
 
             //tratando retorno
             if(result){
-
                 //verificando tamanho do array de resposta
                 if(result.length > 0){
 
                     //editando cabeçalho
-                    message.DEFAULT_MESSAGE.status = message.SUCESS_RESPONSE.status
-                    message.DEFAULT_MESSAGE.status_code = message.SUCESS_RESPONSE.status_code
+                    message.DEFAULT_MESSAGE.status = message.SUCCESS_RESPONSE.status
+                    message.DEFAULT_MESSAGE.status_code = message.SUCCESS_RESPONSE.status_code
                     message.DEFAULT_MESSAGE.response.anexo = result
 
                     return message.DEFAULT_MESSAGE //200                 
@@ -292,21 +289,26 @@ const buscarAnexoId = async function(id){
 
 //função para excluir um dado
 const excluirAnexo = async function(id){
-
+ 
     let message = JSON.parse(JSON.stringify(config_message))
-
+ 
     try {
         
         //validando id
         let validarId = await buscarAnexoId(id)
-
+ 
         if(validarId.status){
-
+ 
+            //guardando a url do arquivo antes de apagar o registro
+            let urlArquivo = validarId.response.anexo[0].endereco_url
             //mandadno para o banco
             let result = await anexoDAO.deleteAnexo(id)
-
+ 
             if(result){
-
+ 
+                //apagando o arquivo no Azure (o registro do banco já foi removido)
+                await UPLOAD.deleteFile(urlArquivo)
+ 
                 return message.SUCCESS_DELETED_ITEM //200 registro excluido
             }else{
                 return message.ERROR_INTERNAL_SERVER_MODEL
@@ -314,11 +316,11 @@ const excluirAnexo = async function(id){
         }else{
             return message.ERROR_BAD_REQUEST
         }
-
+ 
     } catch (error) {
         return message.ERROR_INTERNAL_SERVER_CONTROLLER
     }
-
+ 
 }
 
 //função para validar os dados recebidos na requição

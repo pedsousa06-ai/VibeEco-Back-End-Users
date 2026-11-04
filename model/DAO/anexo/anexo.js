@@ -106,19 +106,18 @@ const selectAllAnexo = async function(){
 
 //retornar dado com base no id
 const selectByIdAnexo = async function(id){
-
     try {
         
         let sql = `select * from tbl_anexo where id = ${id}`
 
         let result = await knexConex.raw(sql)
-
         if(Array.isArray(result)){
             return result[0]
         }else{
             return false
         }
     } catch (error) {
+        //console.log(error)
         return false
     }
 }

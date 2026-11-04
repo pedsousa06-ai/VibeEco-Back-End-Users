@@ -137,89 +137,6 @@ const inserirNovoPost = async function(post, contentType, arquivos = []) {
     }
 }
 
-//Atualizar
-// const atualizarPost = async function (post, id, contentype) {
-//     //Criando um clone do objeto JSON para manipular sua estrutura sem modificar o arquivo original
-//     let message = JSON.parse(JSON.stringify(config_message))
-//     try {
-//         // CORREÇÃO: Se a categoria vier como string do form-data, converte para array/objeto real
-//         if (typeof post.categoria === 'string') {
-//             try {
-//                 post.categoria = JSON.parse(post.categoria)
-//             } catch (error) {
-//                 message.ERROR_BAD_REQUEST.field = '[CATEGORIA] INVÁLIDA (Formato JSON incorreto)'
-//                 return message.ERROR_BAD_REQUEST
-//             }
-//         }
-//         //Validação do contentType para receber formato de dados em JSON
-//         if(type.includes('APPLICATION/JSON') || type.includes('MULTIPART/FORM-DATA')){
-//             let resultBuscarID = await buscarPost(id)
-//             if(resultBuscarID.status){
-//                 //Validação de campos obrigatórios para atualização (body)
-//                 let validar = await validarDados(post, contentype)
-//                 if(!validar){
-//                     //Adicionando o atributo ID do post no JSON para ser enviado ao DAO
-//                     post.id = id
-//                     //Chama a função do DAO para atualizar o post
-//                     let result = await postDAO.updatePost(post)
-//                     if(result){
-
-//                         //Manipulação de dados na tabela de relação entre post e categoria
-//                         let resultDeleteCategoria = await controller_post_categoria.excluirCategoriaIdPost(post.id)
-//                         //Após a exclusão de todos as categorias com o post
-//                         if(resultDeleteCategoria.status){
-//                             //Manipulação de dados para inserir as categorias do post
-//                             for(categoria of post.categoria){
-//                                 //Cria o objeto JSON com o id do filme e o id do gênero
-//                                 let postCategoria = {
-//                                 "id_post": post.id,
-//                                 "id_categoria": categoria.id
-//                                 }
-//                                 //Chama a controller do post_categoria para inserir os IDs
-//                                 let resultInsertCategoria = await controller_post_categoria.inserirNovoPostCategoria(postCategoria)
-//                                 if(!resultInsertCategoria)
-//                                     return message.SUCCESS_CREATED_ITEM_WARNING //201 (ok, porém com WARNING)
-//                             }
-//                         }
-
-//                         //Manipulação de dados na tabela de relação entre post e categoria
-//                         let resultDeleteAnexo = await controller_post_anexo.excluirAnexosIdPost(post.id)
-//                         //Após a exclusão de todos as categorias com o post
-//                         if(resultDeleteAnexo.status){
-//                             //Manipulação de dados para inserir as categorias do post
-//                             for(anexo of post.anexo){
-//                                 //Cria o objeto JSON com o id do filme e o id do gênero
-//                                 let postAnexo = {
-//                                 "id_post": post.id,
-//                                 "id_anexo": anexo.id
-//                                 }
-//                                 //Chama a controller do post_categoria para inserir os IDs
-//                                 let resultInsertAnexo = await controller_post_anexo.inserirNovoPostAnexo(postAnexo)
-//                                 if(!resultInsertAnexo)
-//                                     return message.SUCCESS_CREATED_ITEM_WARNING //201 (ok, porém com WARNING)
-//                             }
-//                         }
-
-//                         message.DEFAULT_MESSAGE.status      = message.SUCCESS_UPDATE_ITEM.status
-//                         message.DEFAULT_MESSAGE.status_code = message.SUCCESS_UPDATE_ITEM.status_code
-//                         message.DEFAULT_MESSAGE.message     = message.SUCCESS_UPDATE_ITEM.message
-//                         message.DEFAULT_MESSAGE.response    = post
-//                         return message.DEFAULT_MESSAGE //200 (Atualizado)
-//                     }else{
-//                         return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
-//                     }
-//                 }
-//             }else{
-//                return resultBuscarID //404, 400, 500 (resultBuscarId)
-//             }
-//         }else
-//             return message.DEFAULT_MESSAGE.ERROR_CONTENT_TYPE //415(contentType)
-//     } catch (error) {
-//         //console.log(error)
-//         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
-//     }
-// }   
-
 //Atualizar (apaga tudo o que existia no post e grava as novas informações)
 const atualizarPost = async function (post, id, contentType, arquivos = []) {
     //Criando um clone do objeto JSON para manipular sua estrutura sem modificar o arquivo original
@@ -313,8 +230,9 @@ const atualizarPost = async function (post, id, contentType, arquivos = []) {
  
         //5. Só agora apaga os anexos ANTIGOS (a relação já foi removida no passo 4)
         //O excluirAnexo apaga a linha da tbl_anexo e o arquivo no Azure
-        for(const antigo of anexosAntigos)
+        for(const antigo of anexosAntigos){
             await controller_anexo.excluirAnexo(antigo.id_anexo)
+        }
  
         post.anexo = anexosNovos
         message.DEFAULT_MESSAGE.status      = message.SUCCESS_UPDATE_ITEM.status
