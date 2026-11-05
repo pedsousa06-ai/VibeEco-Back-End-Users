@@ -390,27 +390,42 @@ const buscarPost = async function (id) {
 
 //Excluir
 const excluirPost = async function (id) {
-    //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar o arquivo original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
         let resultBuscarID = await buscarPost(id)
         if(resultBuscarID.status){
+
+            //1. Guarda os anexos ANTES de apagar (depois disso a relação some)
+            let anexos = []
+            let resultAnexos = await controller_post_anexo.buscarAnexosIdPost(id)
+            if(resultAnexos.status)
+                anexos = resultAnexos.response.post_anexo
+
+            //2. Apaga o post (a tgrDeletePost remove as relações, inclusive tbl_post_anexo)
             let result = await postDAO.deletePost(id)
             if(result){
+
+                //3. Com a relação já removida, a FK não bloqueia mais.
+                //   O excluirAnexo apaga a linha de tbl_anexo e o blob no Azure
+                for(const anexo of anexos){
+                    let r = await controller_anexo.excluirAnexo(anexo.id_anexo)
+                    if(!r.status)
+                        console.log('Falha ao excluir anexo:', anexo.id_anexo, r)
+                }
+
                 message.DEFAULT_MESSAGE.status      = message.SUCCESS_DELETED_ITEM.status
                 message.DEFAULT_MESSAGE.status_code = message.SUCCESS_DELETED_ITEM.status_code
                 message.DEFAULT_MESSAGE.message     = message.SUCCESS_DELETED_ITEM.message
-                
                 return message.DEFAULT_MESSAGE
             }else{
                 return message.ERROR_INTERNAL_SERVER_MODEL //500
             }
         }else{
-            return resultBuscarID //404 (not found), 400 (error bad request), 500 (data base), 500 (controller) 
+            return resultBuscarID //404, 400, 500
         }
     } catch (error) {
-        //console.log(error)
-        return message.DEFAULT_MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER //estava message.DEFAULT_MESSAGE.ERROR_... (undefined)
     }
 }
 
