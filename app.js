@@ -24,6 +24,7 @@ const upload        = multer()
 const controllerPost = require('./controller/post/controller_post.js')
 const controllerPostComentario = require('./controller/post/controller_post_comentario.js')
 const controllerPostCurtida = require('./controller/post/controller_post_curtida.js')
+const controllerRanking = require("./controller/ranking/ranking.js")
 
 //criando um objeto para manipular dados do body da API em formato Json
 const bodyParserJson = bodyParser.json()
@@ -81,18 +82,6 @@ app.get('/v1/senai/vibeEco/post/:id', async function(request, response){
     response.status(result.status_code)
     response.json(result)
 })
-
-// app.put('/v1/senai/vibeEco/post/:id', bodyParserJson, async function (request, response) {
-//     //Recebe o content-type da requisição
-//     let contentType = request.headers['content-type']
-//     //Recebe o id a ser atualizado
-//     let id = request.params.id
-//     //Recebe os dados enviados no corpo da requisição
-//     let dados = request.body
-//     let result = await controllerPost.atualizarPost(dados, id, contentType)
-//     response.status(result.status_code)
-//     response.json(result)
-// })
 
 app.put('/v1/senai/vibeEco/post/:id', upload.array('anexos',5), async function (request, response) {
     let dados = request.body
@@ -200,6 +189,15 @@ app.delete('/v1/senai/vibeEco/postCurtida', bodyParserJson, async function (requ
     response.status(result.status_code)
     response.json(result)
 })
+
+//ranking
+app.get('/v1/senai/vibeEco/ranking', async function(request, response){
+    let result = await controllerRanking.listarRanking()
+    response.status(result.status_code)
+    response.json(result)
+})
+
+
 
 //iniciando uma API para receber requisições
 app.listen(8080, function(){ //decidindo a porta para saída do conteúdo

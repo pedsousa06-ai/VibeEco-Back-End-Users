@@ -228,8 +228,8 @@ const listarAnexo = async function(){
             if(result.length > 0){
 
                 //personalizando o cabeçalho com a mensagem de sucesso
-                message.DEFAULT_MESSAGE.status = message.SUCESS_RESPONSE.status
-                message.DEFAULT_MESSAGE.status_code = message.SUCESS_RESPONSE.status_code
+                message.DEFAULT_MESSAGE.status = message.SUCCESS_RESPONSE.status
+                message.DEFAULT_MESSAGE.status_code = message.SUCCESS_RESPONSE.status_code
                 message.DEFAULT_MESSAGE.response.count = result.length
                 message.DEFAULT_MESSAGE.response.anexo = result
 
