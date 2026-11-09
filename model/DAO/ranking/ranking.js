@@ -38,4 +38,42 @@ const selectAllRanking = async function(){
     }
 }
 
-module.exports = {selectAllRanking}
+const updateVisibilidadeRanking = async function(exibirRanking){
+    try {
+        // exibir deve ser true ou false
+        let sql = `update tbl_usuario set exibir_ranking = 
+            ${exibirRanking.exibir_ranking} where id = ${exibirRanking.id};`
+        
+        //enviando para o banco de dados
+        let result = await knexConex.raw(sql)
+        //Verificando se é um array
+        if(Array.isArray(result)){
+            return result[0]
+        }else{
+            return false
+        }
+    } catch (error) {
+        //console.log(error)
+        return false
+    }
+}
+
+//retornar dado com base no id
+const selectByIdUsuario = async function(id){
+
+    try {
+        
+        let sql = `select * from tbl_usuario where id = ${id};`
+        let result = await knexConex.raw(sql)
+
+        if(Array.isArray(result)){
+            return result[0]
+        }else{
+            return false
+        }
+    } catch (error) {
+        return false
+    }
+}
+
+module.exports = {selectAllRanking, updateVisibilidadeRanking, selectByIdUsuario}

@@ -197,6 +197,18 @@ app.get('/v1/senai/vibeEco/ranking', async function(request, response){
     response.json(result)
 })
 
+app.put('/v1/senai/vibeEco/ranking/:id', bodyParserJson, async function (request, response) {
+    //Recebe o content-type da requisição
+    let contentType = request.headers['content-type']
+    //Recebe o id a ser atualizado
+    let id = request.params.id
+    //Recebe os dados enviados no corpo da requisição
+    let dados = request.body
+    let result = await controllerRanking.atualizarRanking(dados, id, contentType)
+    response.status(result.status_code)
+    response.json(result)
+})
+
 
 
 //iniciando uma API para receber requisições
