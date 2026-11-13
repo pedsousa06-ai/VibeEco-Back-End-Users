@@ -47,8 +47,9 @@ const updateUsuarioMissao = async function (usuario_missao) {
     try {
         let sql = `update tbl_usuario_missao set
         id_usuario      =  ${usuario_missao.id_usuario},
-        id_missao       = '${usuario_missao.id_post}',
-        status          = '${usuario_missao.status}'
+        id_missao       = '${usuario_missao.id_missao}',
+        status          = '${usuario_missao.status}',
+        data_conclusao  = now()
         where id        =   ${usuario_missao.id};`
 
         let result = await knexConex.raw(sql)
@@ -67,7 +68,7 @@ const updateUsuarioMissao = async function (usuario_missao) {
 const selectUsuarioMissaoByIdMissao = async function (id_missao) {
     try {
         //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarComentariosByIdPost(${id_missao})`
+        let sql = `call procListarMissaoIdMissao(${id_missao})`
         let result = await knexConex.raw(sql)
         if (Array.isArray(result)) {
             return result[0][0]
@@ -82,7 +83,7 @@ const selectUsuarioMissaoByIdMissao = async function (id_missao) {
 const selectUsuarioMissaoByIdUsuario = async function (id_usuario) {
     try {
         //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarComentariosByIdUsuario(${id_usuario});`
+        let sql = `call procListarMissaoIdUsuario(${id_usuario});`
         let result = await knexConex.raw(sql)
         if (Array.isArray(result)) {
             return result[0][0]
@@ -94,10 +95,10 @@ const selectUsuarioMissaoByIdUsuario = async function (id_usuario) {
 }
 
 //Read
-const selectByIdUsuarioMissao = async function (id) {
+const selectByIdUsuarioByIdMissao = async function (id_missao, id_usuario) {
     try {
         //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarComentariosByIdpostComentario(${id});`
+        let sql = `call procListarMissaoIdMissaoIdUsuario(${id_missao, id_usuario});`
         let result = await knexConex.raw(sql)
         if (Array.isArray(result)) {
             return result[0][0]
@@ -147,7 +148,7 @@ module.exports = {
     updateUsuarioMissao,
     selectUsuarioMissaoByIdMissao,
     selectUsuarioMissaoByIdUsuario,
-    selectByIdUsuarioMissao,
+    selectByIdUsuarioByIdMissao,
     deleteUsuarioMissao,
     deleteMissoesByIdUsuario
 }
