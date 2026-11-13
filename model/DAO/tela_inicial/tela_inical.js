@@ -18,13 +18,9 @@ const knexConex = knex(knexConfig.development) //aciona o knex e passa as config
 const selectDadosInicioByIdUsuario = async function(id){
 
     try {
-        
-        //criando variável sql
-        let sql = `call procListarDadosInicio(${id});`
 
         //enviando para o banco de dados
-        let result = await knexConex.raw(sql)
-
+        let result = await knexConex.raw('call procListarDadosInicio(?)', [id])
         //Verificando se é um array
         if(Array.isArray(result)){
 
@@ -42,13 +38,9 @@ const selectDadosInicioByIdUsuario = async function(id){
 const selectMissoesAndamentoByIdUsuario = async function(id){
 
     try {
-        
-        //criando variável sql
-        let sql = `call procListarMissaoEmAndamento(${id});`
 
         //enviando para o banco de dados
-        let result = await knexConex.raw(sql)
-
+        let result = await knexConex.raw('call procListarMissaoEmAndamento(?)', [id])
         //Verificando se é um array
         if(Array.isArray(result)){
 
@@ -66,13 +58,9 @@ const selectMissoesAndamentoByIdUsuario = async function(id){
 const selectConteudosRecomendadosByIdUsuario = async function(id){
 
     try {
-        
-        //criando variável sql
-        let sql = `call procListarConteudoEducativoUsuario(${id});`
 
         //enviando para o banco de dados
-        let result = await knexConex.raw(sql)
-
+        let result = await knexConex.raw('call procListarConteudoEducativoUsuario(?)', [id])
         //Verificando se é um array
         if(Array.isArray(result)){
 
@@ -90,13 +78,9 @@ const selectConteudosRecomendadosByIdUsuario = async function(id){
 const selectOfensivaByIdUsuario = async function(id){
 
     try {
-        
-        //criando variável sql
-        let sql = `call procListarOfensivaUsuario(${id});`
 
         //enviando para o banco de dados
-        let result = await knexConex.raw(sql)
-
+        let result = await knexConex.raw('call procListarOfensivaUsuario(?)', [id])
         //Verificando se é um array
         if(Array.isArray(result)){
 
@@ -138,13 +122,9 @@ const selectDesafiosDestaque = async function(){
 const selectConquistasByIdUsuario = async function(id){
 
     try {
-        
-        //criando variável sql
-        let sql = `call procListarConquistasUsuario(${id});`
 
         //enviando para o banco de dados
-        let result = await knexConex.raw(sql)
-
+        let result = await knexConex.raw('call procListarConquistasUsuario(?)', [id])
         //Verificando se é um array
         if(Array.isArray(result)){
 
