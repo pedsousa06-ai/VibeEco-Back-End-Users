@@ -95,6 +95,21 @@ const selectUsuarioMissaoByIdUsuario = async function (id_usuario) {
 }
 
 //Read
+const selectByIdUsuarioMissao = async function (id) {
+    try {
+        //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
+        let sql = `select * from tbl_usuario_missao where id = ${id}`
+        let result = await knexConex.raw(sql)
+        if (Array.isArray(result)) {
+            return result[0]
+        } else
+            return false
+    } catch (error) {
+        return false
+    }
+}
+
+//Read
 const selectByIdUsuarioByIdMissao = async function (id_missao, id_usuario) {
     try {
         //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
@@ -146,6 +161,7 @@ const deleteMissoesByIdUsuario = async function (id_usuario) {
 module.exports = {
     insertUsuarioMissao,
     updateUsuarioMissao,
+    selectByIdUsuarioMissao,
     selectUsuarioMissaoByIdMissao,
     selectUsuarioMissaoByIdUsuario,
     selectByIdUsuarioByIdMissao,

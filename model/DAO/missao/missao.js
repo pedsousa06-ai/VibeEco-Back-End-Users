@@ -24,7 +24,7 @@ const selectAllMissao = async function (id_usuario) {
         let sql = `call procListarTodasMissoes(${id_usuario});`
         let result = await knexConex.raw(sql)
         if (Array.isArray(result)) {
-            return result[0]
+            return result[0][0]
         } else
             return false
     } catch (error) {
@@ -39,7 +39,7 @@ const selectAllMissaoDisponivel = async function (id_usuario) {
         let sql = `call procListarTodasMissoesDisponiveis(${id_usuario});`
         let result = await knexConex.raw(sql)
         if (Array.isArray(result)) {
-            return result[0]
+            return result[0][0]
         } else
             return false
     } catch (error) {
@@ -54,7 +54,7 @@ const selectAllMissaoAndamento = async function (id_usuario) {
         let sql = `call procListarTodasMissoesAndamento(${id_usuario});`
         let result = await knexConex.raw(sql)
         if (Array.isArray(result)) {
-            return result[0]
+            return result[0][0]
         } else
             return false
     } catch (error) {
@@ -69,7 +69,7 @@ const selectAllMissaoConcluida = async function (id_usuario) {
         let sql = `call procListarTodasMissoesConcluidas(${id_usuario});`
         let result = await knexConex.raw(sql)
         if (Array.isArray(result)) {
-            return result[0]
+            return result[0][0]
         } else
             return false
     } catch (error) {

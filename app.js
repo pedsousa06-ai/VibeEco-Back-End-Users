@@ -26,6 +26,7 @@ const controllerPostComentario = require('./controller/post/controller_post_come
 const controllerPostCurtida = require('./controller/post/controller_post_curtida.js')
 const controllerRanking = require("./controller/ranking/ranking.js")
 const controllerInicio = require("./controller/tela_inicial/controller_tela_inicial.js")
+const controllermissoes = require('./controller/missao/controller_missao.js')
 
 
 //criando um objeto para manipular dados do body da API em formato Json
@@ -219,6 +220,13 @@ app.get('/v1/senai/vibeEco/telaInicio/:id', async function(request, response){
     response.json(result)
 })
 
+//Tela inicio
+app.get('/v1/senai/vibeEco/missoes/todasmissoes/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllermissoes.ListarTodasMissoes(id)
+    response.status(result.status_code)
+    response.json(result)
+})
 
 //iniciando uma API para receber requisições
 app.listen(8080, function(){ //decidindo a porta para saída do conteúdo
