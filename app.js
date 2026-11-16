@@ -26,7 +26,8 @@ const controllerPostComentario = require('./controller/post/controller_post_come
 const controllerPostCurtida = require('./controller/post/controller_post_curtida.js')
 const controllerRanking = require("./controller/ranking/ranking.js")
 const controllerInicio = require("./controller/tela_inicial/controller_tela_inicial.js")
-const controllermissoes = require('./controller/missao/controller_missao.js')
+const controllerMissoes = require('./controller/missao/controller_missao.js')
+const controllerUsuarioMissao = require("./controller/missao/controller_usuario_missao.js")
 
 
 //criando um objeto para manipular dados do body da API em formato Json
@@ -220,12 +221,86 @@ app.get('/v1/senai/vibeEco/telaInicio/:id', async function(request, response){
     response.json(result)
 })
 
-//Tela inicio
+//Todas as missoes
 app.get('/v1/senai/vibeEco/missoes/todasmissoes/:id', async function(request, response){
     let id = request.params.id
-    let result = await controllermissoes.ListarTodasMissoes(id)
+    let result = await controllerMissoes.ListarTodasMissoes(id)
     response.status(result.status_code)
     response.json(result)
+})
+
+//Todas as missoes disponiveis
+app.get('/v1/senai/vibeEco/missoes/missoesDisponiveis/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerMissoes.ListarTodasMissoesDisponiveis(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+//Todas as missoes em andamento
+app.get('/v1/senai/vibeEco/missoes/missoesAndamento/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerMissoes.ListarTodasMissoesEmAndamento(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+//Todas as missoes concluidas
+app.get('/v1/senai/vibeEco/missoes/missoesConcluidas/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerMissoes.ListarTodasMissoesConcluidas(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.post('/v1/senai/vibeEco/usuarioMissao', bodyParserJson, async function(request, response){
+    //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
+    let dados = request.body
+    let contentType = request.headers['content-type']
+    let result = await controllerUsuarioMissao.inserirUsuarioMissao(dados, contentType)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.get('/v1/senai/vibeEco/usuarioMissaoIdMissao/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerUsuarioMissao.buscarUsuarioMissaoIdMissao(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.get('/v1/senai/vibeEco/usuarioMissaoIdUsuario/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerUsuarioMissao.buscarUsuarioMissaoIdUsuario(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.get('/v1/senai/vibeEco/usuarioMissao/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerUsuarioMissao.buscarUsuarioMissao(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+//Retorna a missão de um usuário específico
+app.get('/v1/senai/vibeEco/usuario/:idUsuario/missao/:idMissao', async function(request, response){
+    //Recebe os ids pela URL
+    let idUsuario = request.params.idUsuario
+    let idMissao  = request.params.idMissao
+
+    //Chama a controller
+    let result = await controllerUsuarioMissao.buscarUsuarioMissaoIdUsuarioIdMissao(idUsuario, idMissao)
+
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.delete('/v1/senai/vibeEco/usuarioMissao/:id', bodyParserJson, async function (request, response) {
+    let id      = request.params.id
+    let result  = await controllerUsuarioMissao.excluirUsuarioMissao(id)
+    response.status(result.status_code)
+    response.json(result) 
 })
 
 //iniciando uma API para receber requisições

@@ -11,6 +11,8 @@ const config_message = require('../modulo/configMessages.js')
 
 //Import do arquivo DAO para fazer o CRUD do gênero no banco de dados
 const usuarioMissaoDAO = require('../../model/DAO/usuario_missao/usuario_missao.js')
+const controllerMissaoEtapa = require('./controller_missao_etapa.js')
+const controller_missao_categoria = require('./controller_missao_categoria.js')
 
 //Criar
 const inserirUsuarioMissao = async function(usuarioMissao, contentType) {
@@ -48,10 +50,12 @@ const inserirUsuarioMissao = async function(usuarioMissao, contentType) {
 }
 
 //Atualizar
-const atualizarUsuarioMissao = async function (usuarioMissao, id) {
+const atualizarUsuarioMissao = async function (usuarioMissao, id, contentType) {
     //Criando um clone do objeto JSON para manipular sua estrutura sem modificar o arquivo original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
+        //Validação do contentType para receber apenas JSON
+        if(String(contentType).toUpperCase() == 'APPLICATION/JSON'){
             let resultBuscarID = await buscarUsuarioMissao(id)
             if(resultBuscarID.status){
                 //Validação de campos obrigatórios para atualização (body)
@@ -73,6 +77,8 @@ const atualizarUsuarioMissao = async function (usuarioMissao, id) {
                     return validar
             }else
                return resultBuscarID //404, 400, 500 (resultBuscarId)
+        }else
+            return message.ERROR_CONTENT_TYPE //415(ContentType)
     } catch (error) {
         //console.log(error)
         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
@@ -91,6 +97,8 @@ const buscarUsuarioMissao = async function (id) {
         }else{
             let result = await usuarioMissaoDAO.selectByIdUsuarioMissao(id)
             if(result){
+                await exibirCategoriasMissao(result)
+                await exibirEtapasMissao(result)
                 if(result.length > 0){
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
@@ -120,6 +128,8 @@ const buscarUsuarioMissaoIdMissao = async function (idMissao) {
         }else{
             let result = await usuarioMissaoDAO.selectUsuarioMissaoByIdMissao(idMissao)
             if(result){
+                await exibirCategoriasMissao(result)
+                await exibirEtapasMissao(result)
                 if(result.length > 0){
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
@@ -133,6 +143,7 @@ const buscarUsuarioMissaoIdMissao = async function (idMissao) {
             }
         }
     } catch (error) {
+        //console.log(error)
        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
     }    
 }
@@ -149,10 +160,12 @@ const buscarUsuarioMissaoIdUsuario = async function (idUsuario) {
         }else{
             let result = await usuarioMissaoDAO.selectUsuarioMissaoByIdUsuario(idUsuario)
             if(result){
+                await exibirCategoriasMissao(result)
+                await exibirEtapasMissao(result)
                 if(result.length > 0){
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.post_curtida = result //201
+                    message.DEFAULT_MESSAGE.response.usuario_missao = result //201
                     return message.DEFAULT_MESSAGE
                 }else{
                     return message.ERROR_NOT_FOUND //404 (Não encontrado)
@@ -181,6 +194,8 @@ const buscarUsuarioMissaoIdUsuarioIdMissao = async function (idUsuario, idMissao
         }else{
             let result = await usuarioMissaoDAO.selectByIdUsuarioByIdMissao(idMissao, idUsuario)
             if(result){
+                await exibirCategoriasMissao(result)
+                await exibirEtapasMissao(result)
                 if(result.length > 0){
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
@@ -199,50 +214,18 @@ const buscarUsuarioMissaoIdUsuarioIdMissao = async function (idUsuario, idMissao
 }
 
 //Excluir
-const excluirUsuarioMissao = async function (id, contentType) {
+const excluirUsuarioMissao = async function (id) {
     let message = JSON.parse(JSON.stringify(config_message))
     try {
-        //validando content type
-        if(String(contentType).toUpperCase() == "APPLICATION/JSON"){
-            let validar = await validarDados(id)
-            if (validar)
-                return validar //400
-            let result = await postCurtidaDAO.deletePostCurtidaByIdPostIdUsuario(postCurtida)
-            if (result) {
-                message.DEFAULT_MESSAGE.status      = message.SUCCESS_DELETED_ITEM.status
-                message.DEFAULT_MESSAGE.status_code = message.SUCCESS_DELETED_ITEM.status_code
-                message.DEFAULT_MESSAGE.message     = message.SUCCESS_DELETED_ITEM.message
-                return message.DEFAULT_MESSAGE
-            } else {
-                return message.ERROR_NOT_FOUND //404 (não existia curtida desse usuário nesse post)
-            }
-        }else
-            return message.ERROR_CONTENT_TYPE //415 (retorna erro de tipo de dados) 
-    } catch (error) {
-        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500
-    }
-}
-
-//Excluir
-const excluirMissoesIdUsuario = async function (idUsuario, contentType) {
-    let message = JSON.parse(JSON.stringify(config_message))
-    try {
-        //validando content type
-        if(String(contentType).toUpperCase() == "APPLICATION/JSON"){
-            let validar = await validarDados(postCurtida)
-            if (validar)
-                return validar //400
-            let result = await postCurtidaDAO.deletePostCurtidaByIdPostIdUsuario(postCurtida)
-            if (result) {
-                message.DEFAULT_MESSAGE.status      = message.SUCCESS_DELETED_ITEM.status
-                message.DEFAULT_MESSAGE.status_code = message.SUCCESS_DELETED_ITEM.status_code
-                message.DEFAULT_MESSAGE.message     = message.SUCCESS_DELETED_ITEM.message
-                return message.DEFAULT_MESSAGE
-            } else {
-                return message.ERROR_NOT_FOUND //404 (não existia curtida desse usuário nesse post)
-            }
-        }else
-            return message.ERROR_CONTENT_TYPE //415 (retorna erro de tipo de dados) 
+        let result = await usuarioMissaoDAO.deleteUsuarioMissao(id)
+        if (result) {
+            message.DEFAULT_MESSAGE.status      = message.SUCCESS_DELETED_ITEM.status
+            message.DEFAULT_MESSAGE.status_code = message.SUCCESS_DELETED_ITEM.status_code
+            message.DEFAULT_MESSAGE.message     = message.SUCCESS_DELETED_ITEM.message
+            return message.DEFAULT_MESSAGE
+        } else {
+            return message.ERROR_NOT_FOUND //404 (não existia curtida desse usuário nesse post)
+        }
     } catch (error) {
         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
@@ -251,10 +234,19 @@ const excluirMissoesIdUsuario = async function (idUsuario, contentType) {
 //Exibir categorias da missao
 const exibirCategoriasMissao = async function(result){
     for(missoes of result){
-        //Cria o objeto de categorias relacionados ao post
+        //Cria o objeto de categorias relacionados a missao
         let resultCategoria = await controller_missao_categoria.buscarMissaoCategoriaIdMissao(missoes.id_missao)
         if(resultCategoria.status){
             missoes.categoria = resultCategoria.response.missao_categoria
+        }
+    }
+}
+
+const exibirEtapasMissao = async function(result){
+    for(missoes of result){
+        let resultEtapas = await controllerMissaoEtapa.buscarEtapasMissaoIdMissao(missoes.id_missao)
+        if(resultEtapas.status){
+            missoes.etapas = resultEtapas.response.etapas_missao
         }
     }
 }
@@ -284,9 +276,9 @@ const validarDados = async function (usuarioMissao) {
 module.exports = {
     inserirUsuarioMissao,
     atualizarUsuarioMissao,
+    buscarUsuarioMissao,
     buscarUsuarioMissaoIdMissao,
     buscarUsuarioMissaoIdUsuario,
     buscarUsuarioMissaoIdUsuarioIdMissao,
     excluirUsuarioMissao,
-    excluirMissoesIdUsuario
 }

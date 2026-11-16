@@ -98,10 +98,10 @@ const selectUsuarioMissaoByIdUsuario = async function (id_usuario) {
 const selectByIdUsuarioMissao = async function (id) {
     try {
         //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `select * from tbl_usuario_missao where id = ${id}`
+        let sql = `call procListarMissaoUsuarioMissao(${id});`
         let result = await knexConex.raw(sql)
         if (Array.isArray(result)) {
-            return result[0]
+            return result[0][0]
         } else
             return false
     } catch (error) {
@@ -113,7 +113,7 @@ const selectByIdUsuarioMissao = async function (id) {
 const selectByIdUsuarioByIdMissao = async function (id_missao, id_usuario) {
     try {
         //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarMissaoIdMissaoIdUsuario(${id_missao, id_usuario});`
+        let sql = `call procListarMissaoIdMissaoIdUsuario(${id_missao},${id_usuario});`
         let result = await knexConex.raw(sql)
         if (Array.isArray(result)) {
             return result[0][0]
@@ -138,26 +138,6 @@ const deleteUsuarioMissao = async function (id) {
     }
 }
 
-//Delete
-/*
-    Essa função será utilizada após o update do post, pois será necessário
-    apagar todos os comentarios relacionados com o post para inserir as novas
-    relações, é uma forma de otimizar o trabalho, pois não precisamos verificar
-    o que foi alterado do original.
-*/
-const deleteMissoesByIdUsuario = async function (id_usuario) {
-    try {
-        let sql = `delete from tbl_usuario_missao where id_usuario = ${id_usuario};`
-        let result = await knexConex.raw(sql)
-        if (result) {
-            return true
-        } else
-            return false
-    } catch (error) {
-        return false
-    }
-}
-
 module.exports = {
     insertUsuarioMissao,
     updateUsuarioMissao,
@@ -165,6 +145,5 @@ module.exports = {
     selectUsuarioMissaoByIdMissao,
     selectUsuarioMissaoByIdUsuario,
     selectByIdUsuarioByIdMissao,
-    deleteUsuarioMissao,
-    deleteMissoesByIdUsuario
+    deleteUsuarioMissao
 }
