@@ -82,6 +82,5 @@ module.exports = {
     concluirEtapa,
     selectByIdUsuarioEtapa,
     selectEtapaByIdUsuario,
-    selectUsuarioByIdEtapa,
-    deleteUsuarioEtapa
+    selectUsuarioByIdEtapa
 }

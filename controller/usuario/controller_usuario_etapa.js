@@ -171,6 +171,5 @@ module.exports = {
     inserirUsuarioEtapa,
     buscarUsuarioEtapa,
     buscarUsuarioEtapaIdEtapa,
-    buscarUsuarioEtapaIdUsuario,
-    excluirUsuarioEtapa
+    buscarUsuarioEtapaIdUsuario
 }
