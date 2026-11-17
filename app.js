@@ -28,6 +28,7 @@ const controllerRanking = require("./controller/ranking/ranking.js")
 const controllerInicio = require("./controller/tela_inicial/controller_tela_inicial.js")
 const controllerMissoes = require('./controller/missao/controller_missao.js')
 const controllerUsuarioMissao = require("./controller/missao/controller_usuario_missao.js")
+const controllerUsuarioEtapa = require("./controller/usuario/controller_usuario_etapa.js")
 
 
 //criando um objeto para manipular dados do body da API em formato Json
@@ -301,6 +302,36 @@ app.delete('/v1/senai/vibeEco/usuarioMissao/:id', bodyParserJson, async function
     let result  = await controllerUsuarioMissao.excluirUsuarioMissao(id)
     response.status(result.status_code)
     response.json(result) 
+})
+
+app.post('/v1/senai/vibeEco/usuarioEtapa', bodyParserJson, async function(request, response){
+    //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
+    let dados = request.body
+    let contentType = request.headers['content-type']
+    let result = await controllerUsuarioEtapa.inserirUsuarioEtapa(dados, contentType)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.get('/v1/senai/vibeEco/usuarioEtapa/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerUsuarioEtapa.buscarUsuarioEtapa(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.get('/v1/senai/vibeEco/usuarioEtapaIdEtapa/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerUsuarioEtapa.buscarUsuarioEtapaIdEtapa(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+app.get('/v1/senai/vibeEco/usuarioEtapaIdUsuario/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controllerUsuarioEtapa.buscarUsuarioEtapaIdUsuario(id)
+    response.status(result.status_code)
+    response.json(result)
 })
 
 //iniciando uma API para receber requisições

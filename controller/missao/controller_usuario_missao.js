@@ -44,7 +44,7 @@ const inserirUsuarioMissao = async function(usuarioMissao, contentType) {
             return message.ERROR_CONTENT_TYPE //415 (retorna erro de tipo de dados) 
 
     } catch (error) {
-        //console.log(error)
+        console.log(error)
         return message.ERROR_INTERNAL_SERVER_CONTROLLER //500(controller)
     }
 }
@@ -233,7 +233,7 @@ const excluirUsuarioMissao = async function (id) {
 
 //Exibir categorias da missao
 const exibirCategoriasMissao = async function(result){
-    for(missoes of result){
+    for(const missoes of result){
         //Cria o objeto de categorias relacionados a missao
         let resultCategoria = await controller_missao_categoria.buscarMissaoCategoriaIdMissao(missoes.id_missao)
         if(resultCategoria.status){
@@ -243,7 +243,7 @@ const exibirCategoriasMissao = async function(result){
 }
 
 const exibirEtapasMissao = async function(result){
-    for(missoes of result){
+    for(const missoes of result){
         let resultEtapas = await controllerMissaoEtapa.buscarEtapasMissaoIdMissao(missoes.id_missao)
         if(resultEtapas.status){
             missoes.etapas = resultEtapas.response.etapas_missao

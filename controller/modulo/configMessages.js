@@ -76,6 +76,11 @@ const SUCCESS_UPDATE_ITEM = {
     message: "Item atualizado com sucesso"
 }
 
+const ERROR_CONFLICT = {
+    status: false, 
+    status_code: 409, 
+    message: 'Conflito com o estado atual do recurso.'
+}
 
 //exportando as mensagens
 module.exports = {
@@ -89,5 +94,6 @@ module.exports = {
     SUCCESS_RESPONSE,
     SUCCESS_DELETED_ITEM,
     SUCCESS_UPDATE_ITEM,
-    SUCCESS_CREATED_ITEM_WARNING
+    SUCCESS_CREATED_ITEM_WARNING,
+    ERROR_CONFLICT
 }

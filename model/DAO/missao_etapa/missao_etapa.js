@@ -32,4 +32,19 @@ const selectMissaoEtapaByIdMissao = async function (id_missao) {
     }
 }
 
-module.exports = {selectMissaoEtapaByIdMissao}
+//Select com critério de filtro o id do post
+const selectByIdMissaoEtapa = async function (id_etapa) {
+    try {
+        //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
+        let sql = `call procListarMissaoEtapaById(${id_etapa})`
+        let result = await knexConex.raw(sql)
+        if (Array.isArray(result)) {
+            return result[0][0]
+        } else
+            return false
+    } catch (error) {
+        return false
+    }
+}
+
+module.exports = {selectMissaoEtapaByIdMissao, selectByIdMissaoEtapa}

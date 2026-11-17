@@ -194,9 +194,9 @@ const excluirPostCategoria = async function (id) {
         if(resultBuscarID.status){
             let result = await postCategoriaDAO.deletePostCategoria(id)
             if(result){
-                message.DEFAULT_MESSAGE.status      = message.SUCESS_DELETE_ITEM.status
-                message.DEFAULT_MESSAGE.status_code = message.SUCESS_DELETE_ITEM.status_code
-                message.DEFAULT_MESSAGE.message     = message.SUCESS_DELETE_ITEM.message
+                message.DEFAULT_MESSAGE.status      = message.SUCCESS_DELETED_ITEM.status
+                message.DEFAULT_MESSAGE.status_code = message.SUCCESS_DELETED_ITEM.status_code
+                message.DEFAULT_MESSAGE.message     = message.SUCCESS_DELETED_ITEM.message
                 
                 return message.DEFAULT_MESSAGE
             }else{
@@ -206,7 +206,7 @@ const excluirPostCategoria = async function (id) {
             return resultBuscarID //404 (not found), 400 (error bad request), 500 (data base), 500 (controller) 
         }
     } catch (error) {
-        return message.DEFAULT_MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
     }
 }
 
@@ -226,7 +226,7 @@ const excluirCategoriaIdPost = async function (idPost) {
                 return message.ERROR_INTERNAL_SERVER_MODEL //500
             }
     } catch (error) {
-        return message.DEFAULT_MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
     }
 }
 

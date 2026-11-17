@@ -35,12 +35,12 @@ const selectByIdUsuario = async function(id){
     }
 }
 
-//Função para atualizar os dados da tabela
-const updateUsuario = async function (usuario) {
+//Função para atualizar os dados da tabela de post_comentario
+const incrementXpCoinsUsuario = async function (usuario) {
     try {
         let sql = `update tbl_usuario set
-        total_xp      =  ${usuario.total_xp},
-        coins         = '${usuario.coins}'
+        total_xp      =  total_xp + ${usuario.total_xp},
+        coins         =  coins + '${usuario.coins}'
         where id      =  ${usuario.id};`
 
         let result = await knexConex.raw(sql)
@@ -50,9 +50,9 @@ const updateUsuario = async function (usuario) {
         else
             return false
     } catch (error) {
-        //console.log(error)
+        console.log(error)
         return false
     }
 }
 
-module.exports = {selectByIdUsuario ,updateUsuario}
+module.exports = {selectByIdUsuario ,incrementXpCoinsUsuario}
