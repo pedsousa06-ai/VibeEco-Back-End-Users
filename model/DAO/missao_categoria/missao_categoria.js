@@ -1,53 +1,62 @@
-/*******************************************************************************************************
- * 
- * Objetivo: Arquivo responsável pelo CRUD no Banco de dados MySQL na tabela 
- * usuario_missao
+
+/***************************************************************
+ * Objetivo: Arquivo responsável pelo CRUD no Banco de dados
+ * MySQL na tabela usuario_missao
  * Data: 12/11/2026
  * Autor: Riller
  * Versão: 1.0
- * 
- *******************************************************************************************************/
+ ***************************************************************/
 
-//Import da biblioteca para gerenciar o banco de dados MySql no node.js
+// Import da biblioteca para gerenciar o banco de dados MySQL no Node.js
 const knex = require('knex')
 
-//Import do arquivo de configuração para conexão com o banco de dados MySql
+// Import do arquivo de configuração para conexão com o banco de dados MySQL
 const knexConfig = require('../../database_config_knex/knex_file.js')
 
-//Criar a conexão com o banco de dados MySql
+// Criar a conexão com o banco de dados MySQL
 const knexConex = knex(knexConfig.development)
 
-//Select com critério de filtro o id do post
+// Select com critério de filtro pelo id da categoria
 const selectMissaoCategoriaByIdCategoria = async function (id) {
     try {
-        //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarMissaoIdCategoria(${id})`
-        let result = await knexConex.raw(sql)
+        // Buscar missões pelo id da categoria
+        let result = await knexConex.raw(
+            'call procListarMissaoIdCategoria(?)',
+            [id]
+        )
+
         if (Array.isArray(result)) {
             return result[0][0]
-        } else
+        } else {
             return false
+        }
     } catch (error) {
+        console.log(error)
         return false
     }
 }
 
-//Read
-const selectMissaoCategoriaByIdMissao    = async function (id) {
+// Read: buscar categoria pelo id da missão
+const selectMissaoCategoriaByIdMissao = async function (id) {
     try {
-        //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarCategoriaByIdMissao(${id});`
-        let result = await knexConex.raw(sql)
+        // Buscar categoria pelo id da missão
+        let result = await knexConex.raw(
+            'call procListarCategoriaByIdMissao(?)',
+            [id]
+        )
+
         if (Array.isArray(result)) {
             return result[0][0]
-        } else
+        } else {
             return false
+        }
     } catch (error) {
+        console.log(error)
         return false
     }
 }
 
 module.exports = {
     selectMissaoCategoriaByIdCategoria,
-    selectMissaoCategoriaByIdMissao,
+    selectMissaoCategoriaByIdMissao
 }
