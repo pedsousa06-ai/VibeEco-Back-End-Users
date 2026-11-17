@@ -21,8 +21,7 @@ const knexConex = knex(knexConfig.development)
 const selectAllMissao = async function (id_usuario) {
     try {
         //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarTodasMissoes(${id_usuario});`
-        let result = await knexConex.raw(sql)
+        let result = await knexConex.raw('call procListarTodasMissoes(?)', [id_usuario])
         if (Array.isArray(result)) {
             return result[0][0]
         } else
@@ -36,8 +35,7 @@ const selectAllMissao = async function (id_usuario) {
 const selectAllMissaoDisponivel = async function (id_usuario) {
     try {
         //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarTodasMissoesDisponiveis(${id_usuario});`
-        let result = await knexConex.raw(sql)
+        let result = await knexConex.raw('call procListarTodasMissoesDisponiveis(?)', [id_usuario])
         if (Array.isArray(result)) {
             return result[0][0]
         } else
@@ -51,8 +49,7 @@ const selectAllMissaoDisponivel = async function (id_usuario) {
 const selectAllMissaoAndamento = async function (id_usuario) {
     try {
         //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarTodasMissoesAndamento(${id_usuario});`
-        let result = await knexConex.raw(sql)
+        let result = await knexConex.raw('call procListarTodasMissoesAndamento(?)', [id_usuario])
         if (Array.isArray(result)) {
             return result[0][0]
         } else
@@ -66,8 +63,7 @@ const selectAllMissaoAndamento = async function (id_usuario) {
 const selectAllMissaoConcluida = async function (id_usuario) {
     try {
         //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarTodasMissoesConcluidas(${id_usuario});`
-        let result = await knexConex.raw(sql)
+        let result = await knexConex.raw('call procListarTodasMissoesConcluidas(?)', [id_usuario])
         if (Array.isArray(result)) {
             return result[0][0]
         } else
