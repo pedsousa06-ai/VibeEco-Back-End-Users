@@ -9,27 +9,6 @@
 const express       = require("express")
 const cors          = require("cors")
 const bodyParser    = require("body-parser")
-const multer        = require('multer')
-//Configuração para o multer enviar o arquivo de imagem
-const storage       = multer.diskStorage({
-    destination: function(request, file, cb){
-        cb(null, 'uploads/')
-    }
-})
-//Instancia para criar um objeto upload
-const upload        = multer()
-
-
-//Import das controllers do projeto
-const controllerPost = require('./controller/post/controller_post.js')
-const controllerPostComentario = require('./controller/post/controller_post_comentario.js')
-const controllerPostCurtida = require('./controller/post/controller_post_curtida.js')
-const controllerRanking = require("./controller/ranking/ranking.js")
-const controllerInicio = require("./controller/tela_inicial/controller_tela_inicial.js")
-const controllerMissoes = require('./controller/missao/controller_missao.js')
-const controllerUsuarioMissao = require("./controller/missao/controller_usuario_missao.js")
-const controllerUsuarioEtapa = require("./controller/usuario/controller_usuario_etapa.js")
-
 
 //criando um objeto para manipular dados do body da API em formato Json
 const bodyParserJson = bodyParser.json()
@@ -47,292 +26,39 @@ const corsOption = {
 //configurando as permissões da API atravez do CORS
 app.use(cors(corsOption))
 
-//EndPoints
-app.post('/v1/senai/vibeEco/post', upload.array('anexos',5), async function(request, response){
+//importando o arquivo onde estão as rotas da tabela
+//Post
+const postRouter = require("./routes/post/routes.js")
+//definindo a rota para acessar as rotas do postRouter (o cors() é para liberar o acesso a essa rota, caso contrário, o navegador bloqueia por questões de segurança)
+app.use("/v1/senai/vibeEco", cors(), postRouter) //quando o usuário acessar a rota "/v1/senai/vibeEco/post" ele vai ser direcionado para o arquivo "post.routes.js"
 
-    let dados = request.body
-    let contentType = request.headers['content-type']
+//Comentario
+const postComentarioRouter = require("./routes/post_comentario/routes.js")
+app.use("/v1/senai/vibeEco", cors(), postComentarioRouter)
 
-    // Recebe os arquivos enviados na requisicao
-    let arquivos = request.files
+//Curtidas
+const postCurtidaRouter = require("./routes/post_curtida/routes.js")
+app.use("/v1/senai/vibeEco", cors(), postCurtidaRouter)
 
-    let result = await controllerPost.inserirNovoPost(
-        dados,
-        contentType,
-        arquivos
-    )
-
-    response.status(result.status_code)
-    response.json(result)
-})
-
-//Seleciona todos os post mais recentes
-app.get('/v1/senai/vibeEco/postRecente', async function(request, response){
-    let result = await controllerPost.listarPost()
-    response.status(result.status_code)
-    response.json(result)
-})
-
-//Seleciona todos os posts tendo como critério de filtro as curtidas
-app.get('/v1/senai/vibeEco/postCurtida', async function(request, response){
-    let result = await controllerPost.listarPostRelevantes()
-    response.status(result.status_code)
-    response.json(result)
-})
-
-//Só é utilizado a busca via parâmetro quando o critério de filtro for o id, nas demais ocasiões é via query
-app.get('/v1/senai/vibeEco/post/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerPost.buscarPost(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.put('/v1/senai/vibeEco/post/:id', upload.array('anexos',5), async function (request, response) {
-    let dados = request.body
-    let contentType = request.headers['content-type']
-    let id = request.params.id
-    // Recebe os arquivos enviados na requisicao
-    let arquivos = request.files
-    let result = await controllerPost.atualizarPost(dados, id, contentType, arquivos)
-
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.delete('/v1/senai/vibeEco/post/:id', bodyParserJson, async function (request, response) {
-    let id      = request.params.id
-    let result  = await controllerPost.excluirPost(id)
-    response.status(result.status_code)
-    response.json(result) 
-})
-
-app.post('/v1/senai/vibeEco/postComentario', bodyParserJson, async function(request, response){
-    //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
-    let dados = request.body
-    let contentType = request.headers['content-type']
-    let result = await controllerPostComentario.inserirPostComentario(dados, contentType)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.get('/v1/senai/vibeEco/postComentarioIdUsuario/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerPostComentario.buscarPostComentarioIdUsuario(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.get('/v1/senai/vibeEco/postComentarioIdPost/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerPostComentario.buscarPostComentarioIdPost(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.get('/v1/senai/vibeEco/postComentario/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerPostComentario.buscarPostComentario(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.put('/v1/senai/vibeEco/postComentario/:id', bodyParserJson, async function (request, response) {
-    //Recebe o content-type da requisição
-    let contentType = request.headers['content-type']
-    //Recebe o id a ser atualizado
-    let id = request.params.id
-    //Recebe os dados enviados no corpo da requisição
-    let dados = request.body
-    let result = await controllerPostComentario.atualizarPostComentario(dados, id, contentType)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.delete('/v1/senai/vibeEco/postComentario/:id', bodyParserJson, async function (request, response) {
-    let id      = request.params.id
-    let result  = await controllerPostComentario.excluirPostComentario(id)
-    response.status(result.status_code)
-    response.json(result) 
-})
-
-app.post('/v1/senai/vibeEco/postCurtida', bodyParserJson, async function(request, response){
-    //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
-    let dados = request.body
-    let contentType = request.headers['content-type']
-    let result = await controllerPostCurtida.inserirPostCurtida(dados, contentType)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.get('/v1/senai/vibeEco/postCurtidaIdUsuario/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerPostCurtida.buscarPostCurtidaIdUsuario(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.get('/v1/senai/vibeEco/postCurtidaIdPost/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerPostCurtida.buscarPostCurtidaIdPost(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.get('/v1/senai/vibeEco/postCurtida/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerPostCurtida.buscarPostCurtida(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.delete('/v1/senai/vibeEco/postCurtida', bodyParserJson, async function (request, response) {
-    //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
-    let dados = request.body
-    let contentType = request.headers['content-type']
-    let result = await controllerPostCurtida.excluirPostCurtidaByIDPostIdUsuario(dados, contentType)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-//ranking
-app.get('/v1/senai/vibeEco/ranking', async function(request, response){
-    let result = await controllerRanking.listarRanking()
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.put('/v1/senai/vibeEco/ranking/:id', bodyParserJson, async function (request, response) {
-    //Recebe o content-type da requisição
-    let contentType = request.headers['content-type']
-    //Recebe o id a ser atualizado
-    let id = request.params.id
-    //Recebe os dados enviados no corpo da requisição
-    let dados = request.body
-    let result = await controllerRanking.atualizarRanking(dados, id, contentType)
-    response.status(result.status_code)
-    response.json(result)
-})
+//Ranking
+const rankingRouter = require("./routes/ranking/routes.js")
+app.use("/v1/senai/vibeEco", cors(), rankingRouter)
 
 //Tela inicio
-app.get('/v1/senai/vibeEco/telaInicio/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerInicio.buscarTelaInicial(id)
-    response.status(result.status_code)
-    response.json(result)
-})
+const telaInicioRouter = require("./routes/tela_inicio/routes.js")
+app.use("/v1/senai/vibeEco", cors(), telaInicioRouter)
 
-//Todas as missoes
-app.get('/v1/senai/vibeEco/missoes/todasmissoes/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerMissoes.ListarTodasMissoes(id)
-    response.status(result.status_code)
-    response.json(result)
-})
+//Missoes
+const missoesRouter = require("./routes/missoes/routes.js")
+app.use("/v1/senai/vibeEco", cors(), missoesRouter)
 
-//Todas as missoes disponiveis
-app.get('/v1/senai/vibeEco/missoes/missoesDisponiveis/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerMissoes.ListarTodasMissoesDisponiveis(id)
-    response.status(result.status_code)
-    response.json(result)
-})
+//Usuario_missao
+const usuarioMissaoRouter = require("./routes/usuario_missao/routes.js")
+app.use("/v1/senai/vibeEco", cors(), usuarioMissaoRouter)
 
-//Todas as missoes em andamento
-app.get('/v1/senai/vibeEco/missoes/missoesAndamento/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerMissoes.ListarTodasMissoesEmAndamento(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-//Todas as missoes concluidas
-app.get('/v1/senai/vibeEco/missoes/missoesConcluidas/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerMissoes.ListarTodasMissoesConcluidas(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.post('/v1/senai/vibeEco/usuarioMissao', bodyParserJson, async function(request, response){
-    //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
-    let dados = request.body
-    let contentType = request.headers['content-type']
-    let result = await controllerUsuarioMissao.inserirUsuarioMissao(dados, contentType)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.get('/v1/senai/vibeEco/usuarioMissaoIdMissao/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerUsuarioMissao.buscarUsuarioMissaoIdMissao(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.get('/v1/senai/vibeEco/usuarioMissaoIdUsuario/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerUsuarioMissao.buscarUsuarioMissaoIdUsuario(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.get('/v1/senai/vibeEco/usuarioMissao/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerUsuarioMissao.buscarUsuarioMissao(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-//Retorna a missão de um usuário específico
-app.get('/v1/senai/vibeEco/usuario/:idUsuario/missao/:idMissao', async function(request, response){
-    //Recebe os ids pela URL
-    let idUsuario = request.params.idUsuario
-    let idMissao  = request.params.idMissao
-
-    //Chama a controller
-    let result = await controllerUsuarioMissao.buscarUsuarioMissaoIdUsuarioIdMissao(idUsuario, idMissao)
-
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.delete('/v1/senai/vibeEco/usuarioMissao/:id', bodyParserJson, async function (request, response) {
-    let id      = request.params.id
-    let result  = await controllerUsuarioMissao.excluirUsuarioMissao(id)
-    response.status(result.status_code)
-    response.json(result) 
-})
-
-app.post('/v1/senai/vibeEco/usuarioEtapa', bodyParserJson, async function(request, response){
-    //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
-    let dados = request.body
-    let contentType = request.headers['content-type']
-    let result = await controllerUsuarioEtapa.inserirUsuarioEtapa(dados, contentType)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.get('/v1/senai/vibeEco/usuarioEtapa/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerUsuarioEtapa.buscarUsuarioEtapa(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.get('/v1/senai/vibeEco/usuarioEtapaIdEtapa/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerUsuarioEtapa.buscarUsuarioEtapaIdEtapa(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-app.get('/v1/senai/vibeEco/usuarioEtapaIdUsuario/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerUsuarioEtapa.buscarUsuarioEtapaIdUsuario(id)
-    response.status(result.status_code)
-    response.json(result)
-})
+//Usuario_etapa
+const usuarioEtapaRouter = require("./routes/usuario_etapa/usuario_etapa.js")
+app.use("/v1/senai/vibeEco", cors(), usuarioEtapaRouter)
 
 //iniciando uma API para receber requisições
 app.listen(8080, function(){ //decidindo a porta para saída do conteúdo

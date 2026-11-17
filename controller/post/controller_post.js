@@ -424,8 +424,8 @@ const excluirPost = async function (id) {
             return resultBuscarID //404, 400, 500
         }
     } catch (error) {
-        console.log(error)
-        return message.ERROR_INTERNAL_SERVER_CONTROLLER //estava message.DEFAULT_MESSAGE.ERROR_... (undefined)
+        //console.log(error)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
 
