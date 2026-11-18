@@ -23,12 +23,10 @@ const insertUsuarioMissao = async function (usuario_missao) {
         let sql = `insert into tbl_usuario_missao (
             id_usuario,
             id_missao,
-            status,
             data_conclusao
         )values(
             '${usuario_missao.id_usuario}',
             '${usuario_missao.id_missao}',
-            '${usuario_missao.status}',
             null
         );`
         let result = await knexConex.raw(sql)
