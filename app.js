@@ -63,9 +63,13 @@ app.use("/v1/senai/vibeEco", cors(), usuarioMissaoRouter)
 const usuarioEtapaRouter = require("./routes/usuario_etapa/usuario_etapa.js")
 app.use("/v1/senai/vibeEco", cors(), usuarioEtapaRouter)
 
-// Configurações (ADICIONADO AQUI)
+// Configurações
 const rotasConfiguracoes = require('./routes/configuracoes/routes.js')
-app.use("/v1/senai/vibeEco", cors(), rotasConfiguracoes) // <--- FALTAVA ISSO AQUI
+app.use("/v1/senai/vibeEco", cors(), rotasConfiguracoes) 
+
+// Histórico (ADICIONADO AQUI)
+const historicoRouter = require("./routes/historico/routes.js")
+app.use("/v1/senai/vibeEco", cors(), historicoRouter)
 
 //iniciando uma API para receber requisições
 app.listen(8080, function(){ 
