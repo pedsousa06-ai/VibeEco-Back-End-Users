@@ -71,6 +71,7 @@ app.use("/v1/senai/vibeEco", cors(), rotasConfiguracoes)
 const historicoRouter = require("./routes/historico/routes.js")
 app.use("/v1/senai/vibeEco", cors(), historicoRouter)
 
+
 //iniciando uma API para receber requisições
 app.listen(8080, function(){ 
     console.log("API funcionando e aguardando requisições...") 
