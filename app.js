@@ -26,11 +26,14 @@ const corsOption = {
 //configurando as permissões da API atravez do CORS
 app.use(cors(corsOption))
 
+// É necessário avisar o Express para ele entender JSON no corpo das requisições (body)
+app.use(bodyParserJson)
+
 //importando o arquivo onde estão as rotas da tabela
 //Post
 const postRouter = require("./routes/post/routes.js")
-//definindo a rota para acessar as rotas do postRouter (o cors() é para liberar o acesso a essa rota, caso contrário, o navegador bloqueia por questões de segurança)
-app.use("/v1/senai/vibeEco", cors(), postRouter) //quando o usuário acessar a rota "/v1/senai/vibeEco/post" ele vai ser direcionado para o arquivo "post.routes.js"
+//definindo a rota para acessar as rotas do postRouter
+app.use("/v1/senai/vibeEco", cors(), postRouter) 
 
 //Comentario
 const postComentarioRouter = require("./routes/post_comentario/routes.js")
@@ -60,7 +63,11 @@ app.use("/v1/senai/vibeEco", cors(), usuarioMissaoRouter)
 const usuarioEtapaRouter = require("./routes/usuario_etapa/usuario_etapa.js")
 app.use("/v1/senai/vibeEco", cors(), usuarioEtapaRouter)
 
+// Configurações (ADICIONADO AQUI)
+const rotasConfiguracoes = require('./routes/configuracoes/routes.js')
+app.use("/v1/senai/vibeEco", cors(), rotasConfiguracoes) // <--- FALTAVA ISSO AQUI
+
 //iniciando uma API para receber requisições
-app.listen(8080, function(){ //decidindo a porta para saída do conteúdo
-    console.log("API funcionando e aguardando requisições...") //vai mostrar no terminal que a API já está funcionando
+app.listen(8080, function(){ 
+    console.log("API funcionando e aguardando requisições...") 
 })
