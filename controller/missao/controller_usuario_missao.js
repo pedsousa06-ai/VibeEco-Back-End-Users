@@ -256,18 +256,12 @@ const validarDados = async function (usuarioMissao) {
     //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar o arquivo original
     let message = JSON.parse(JSON.stringify(config_message))
 
-    //Valores aceitos pelo ENUM da coluna status
-    const statusPermitidos = ['EM_ANDAMENTO', 'CONCLUIDA', 'CANCELADA']
-
     //Validação de dados para os atributos do usuario_missao (400)
     if (usuarioMissao.id_missao == '' || usuarioMissao.id_missao == null || usuarioMissao.id_missao == undefined || isNaN(usuarioMissao.id_missao)) {
         message.ERROR_BAD_REQUEST.field = '[ID_MISSAO] INVÁLIDO' //400
         return message.ERROR_BAD_REQUEST
     } else if (usuarioMissao.id_usuario == '' || usuarioMissao.id_usuario == null || usuarioMissao.id_usuario == undefined || isNaN(usuarioMissao.id_usuario)) {
         message.ERROR_BAD_REQUEST.field = '[ID_USUARIO] INVÁLIDO' //400
-        return message.ERROR_BAD_REQUEST
-    } else if (!statusPermitidos.includes(usuarioMissao.status)) {
-        message.ERROR_BAD_REQUEST.field = '[STATUS] INVÁLIDO (EM_ANDAMENTO, CONCLUIDA ou CANCELADA)' //400
         return message.ERROR_BAD_REQUEST
     } else
         return false

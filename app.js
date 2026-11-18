@@ -60,6 +60,10 @@ app.use("/v1/senai/vibeEco", cors(), usuarioMissaoRouter)
 const usuarioEtapaRouter = require("./routes/usuario_etapa/usuario_etapa.js")
 app.use("/v1/senai/vibeEco", cors(), usuarioEtapaRouter)
 
+//Usuario_desafio
+const usuarioDesafioRouter = require("./routes/desafios/routes.js")
+app.use("/v1/senai/vibeEco", cors(), usuarioDesafioRouter)
+
 //iniciando uma API para receber requisições
 app.listen(8080, function(){ //decidindo a porta para saída do conteúdo
     console.log("API funcionando e aguardando requisições...") //vai mostrar no terminal que a API já está funcionando
