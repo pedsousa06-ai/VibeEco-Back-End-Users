@@ -1,77 +1,82 @@
-/********************************************************************************************************************************************************************************************
- * Objetivo: API centralizada para alimentar o sistema dos usuários do VibeEco, fornecendo endpoints para gerenciamento de usuários, missões, desafios, conteúdos educativos, premiações, conquistas e recompensas.
- * Data: 21/10/2026
+
+/***************************************************************
+ * Objetivo: API centralizada do VibeEco
  * Autor: Riller Feitosa
  * Versão: 1.0.10.26
- *******************************************************************************************************************************************************************************************/
+ ***************************************************************/
 
-/* IMPORTAÇÃO DAS DEPENDÊNCIAS */
-const express       = require("express")
-const cors          = require("cors")
-const bodyParser    = require("body-parser")
+// IMPORTAÇÃO DAS DEPENDÊNCIAS
+const express = require("express")
+const cors = require("cors")
+const bodyParser = require("body-parser")
 
-//criando um objeto para manipular dados do body da API em formato Json
-const bodyParserJson = bodyParser.json()
-
-//criando um objeto para manipular o express
+// Configuração do Express
 const app = express()
 
-//conjunto de permissões a serem aplicados no CORS da API
+// Configuração do JSON
+app.use(bodyParser.json())
+
+// Configuração do CORS
 const corsOption = {
-    origin: "*", //A origrm da requisição (definido por meio do IP (192.168...), quando colocado o "*" fica livre para todas as máquinas)
-    methods: "GET, POST, PUT, DELETE, OPTIONS", //são os verbos permitidos para serem utilizados na API
-    allowedHeaders: ["content-type", "Authorization"] //são permissões do cabeçalho do CORS
+    origin: "*",
+    methods: "GET, POST, PUT, DELETE, OPTIONS",
+    allowedHeaders: ["Content-Type", "Authorization"]
 }
 
-//configurando as permissões da API atravez do CORS
 app.use(cors(corsOption))
 
-// É necessário avisar o Express para ele entender JSON no corpo das requisições (body)
-app.use(bodyParserJson)
+// ROTA BASE DA API
+const API_BASE = "/v1/senai/vibeEco"
 
-//importando o arquivo onde estão as rotas da tabela
-//Post
+// POST
 const postRouter = require("./routes/post/routes.js")
-//definindo a rota para acessar as rotas do postRouter
-app.use("/v1/senai/vibeEco", cors(), postRouter) 
+app.use(API_BASE, postRouter)
 
-//Comentario
+// COMENTÁRIOS
 const postComentarioRouter = require("./routes/post_comentario/routes.js")
-app.use("/v1/senai/vibeEco", cors(), postComentarioRouter)
+app.use(API_BASE, postComentarioRouter)
 
-//Curtidas
+// CURTIDAS
 const postCurtidaRouter = require("./routes/post_curtida/routes.js")
-app.use("/v1/senai/vibeEco", cors(), postCurtidaRouter)
+app.use(API_BASE, postCurtidaRouter)
 
-//Ranking
+// RANKING
 const rankingRouter = require("./routes/ranking/routes.js")
-app.use("/v1/senai/vibeEco", cors(), rankingRouter)
+app.use(API_BASE, rankingRouter)
 
-//Tela inicio
+// TELA INICIAL
 const telaInicioRouter = require("./routes/tela_inicio/routes.js")
-app.use("/v1/senai/vibeEco", cors(), telaInicioRouter)
+app.use(API_BASE, telaInicioRouter)
 
-//Missoes
+// MISSÕES
 const missoesRouter = require("./routes/missoes/routes.js")
-app.use("/v1/senai/vibeEco", cors(), missoesRouter)
+app.use(API_BASE, missoesRouter)
 
-//Usuario_missao
+// USUÁRIO_MISSÃO
 const usuarioMissaoRouter = require("./routes/usuario_missao/routes.js")
-app.use("/v1/senai/vibeEco", cors(), usuarioMissaoRouter)
+app.use(API_BASE, usuarioMissaoRouter)
 
-//Usuario_etapa
+// USUÁRIO_ETAPA
 const usuarioEtapaRouter = require("./routes/usuario_etapa/usuario_etapa.js")
-app.use("/v1/senai/vibeEco", cors(), usuarioEtapaRouter)
+app.use(API_BASE, usuarioEtapaRouter)
 
-// Configurações
-const rotasConfiguracoes = require('./routes/configuracoes/routes.js')
-app.use("/v1/senai/vibeEco", cors(), rotasConfiguracoes) 
+// CONFIGURAÇÕES
+const rotasConfiguracoes = require("./routes/configuracoes/routes.js")
+app.use(API_BASE, rotasConfiguracoes)
 
-// Histórico (ADICIONADO AQUI)
+// HISTÓRICO
 const historicoRouter = require("./routes/historico/routes.js")
-app.use("/v1/senai/vibeEco", cors(), historicoRouter)
+app.use(API_BASE, historicoRouter)
 
-//iniciando uma API para receber requisições
-app.listen(8080, function(){ 
-    console.log("API funcionando e aguardando requisições...") 
+// NOTIFICAÇÕES
+const notificacaoRouter = require("./routes/notificacao/routes.js")
+
+console.log("Router de notificações:", typeof notificacaoRouter)
+
+app.use(API_BASE, notificacaoRouter)
+
+// INICIALIZAÇÃO DA API
+app.listen(8080, function() {
+    console.log("API funcionando e aguardando requisições...")
+    console.log(`Endereço: http://localhost:8080${API_BASE}`)
 })
