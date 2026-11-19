@@ -81,5 +81,19 @@ router.delete('/post/:id', bodyParserJson, async function (request, response) {
     response.json(result) 
 })
 
+// ============================================================================
+// ROTA PARA CRIAR COMENTÁRIO
+// ============================================================================
+router.post('/post/:id/comentario', async function(request, response) {
+    let id = request.params.id
+    let dados = request.body
+    
+    // Chama a função do controller (que você vai precisar criar se não existir)
+    let result = await controllerPost.criarComentario(id, dados)
+    
+    response.status(result.status_code)
+    response.json(result)
+})
+
 // Exporta as rotas para o app.js
 module.exports = router
