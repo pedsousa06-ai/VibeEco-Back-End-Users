@@ -1,33 +1,41 @@
-//importando o express
-const express = require("express")
-const bodyParser    = require("body-parser")
+// routes/ranking/router_ranking.js
+const express = require('express')
+const controllerRanking = require('../../controller/ranking/controller_ranking.js')
 
-//criando um objeto para manipular dados do body da API em formato Json
-const bodyParserJson = bodyParser.json()
-
-//cria um objeto de rota para o arquivo
 const router = express.Router()
 
-const controllerRanking = require('../../controller/ranking/ranking.js')
-
-//ranking
-router.get('/ranking', async function(request, response){
-    let result = await controllerRanking.listarRanking()
-    response.status(result.status_code)
-    response.json(result)
+router.get('/ranking', async (request, response) => {
+  try {
+    const resultado = await controllerRanking.listarRanking()
+    return response.status(resultado.status_code).json(resultado)
+  } catch (error) {
+    console.error('GET /ranking:', error)
+    return response.status(500).json({
+      status_code: 500,
+      status: false,
+      message: 'Erro interno ao consultar o ranking.',
+      response: {}
+    })
+  }
 })
 
-router.put('/ranking/:id', bodyParserJson, async function (request, response) {
-    //Recebe o content-type da requisição
-    let contentType = request.headers['content-type']
-    //Recebe o id a ser atualizado
-    let id = request.params.id
-    //Recebe os dados enviados no corpo da requisição
-    let dados = request.body
-    let result = await controllerRanking.atualizarRanking(dados, id, contentType)
-    response.status(result.status_code)
-    response.json(result)
+router.put('/ranking/:id', express.json(), async (request, response) => {
+  try {
+    const resultado = await controllerRanking.atualizarRanking(
+      request.body,
+      request.params.id,
+      request.headers['content-type']
+    )
+    return response.status(resultado.status_code).json(resultado)
+  } catch (error) {
+    console.error('PUT /ranking/:id:', error)
+    return response.status(500).json({
+      status_code: 500,
+      status: false,
+      message: 'Erro interno ao atualizar o ranking.',
+      response: {}
+    })
+  }
 })
 
-// Exporta as rotas para o app.js
 module.exports = router
