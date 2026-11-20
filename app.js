@@ -75,6 +75,15 @@ console.log("Router de notificações:", typeof notificacaoRouter)
 
 app.use(API_BASE, notificacaoRouter)
 
+
+// CONTEÚDOS EDUCATIVOS
+const conteudoEducativoRouter = require(
+    "./routes/conteudo_educativo/routes.js"
+)
+
+app.use(API_BASE, conteudoEducativoRouter)
+
+
 // INICIALIZAÇÃO DA API
 app.listen(8080, function() {
     console.log("API funcionando e aguardando requisições...")
