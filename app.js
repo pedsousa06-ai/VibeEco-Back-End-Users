@@ -60,6 +60,10 @@ app.use(API_BASE, usuarioMissaoRouter)
 const desafiosRouter = require("./routes/desafios/routes.js")
 app.use(API_BASE, desafiosRouter)
 
+// PERFIL DO USUÁRIO
+const perfilRouter = require("./routes/perfil/routes.js")
+app.use(API_BASE, perfilRouter)
+
 // USUÁRIO_ETAPA
 const usuarioEtapaRouter = require("./routes/usuario_etapa/usuario_etapa.js")
 app.use(API_BASE, usuarioEtapaRouter)
