@@ -62,6 +62,19 @@ router.get('/desafios/usuario/:idUsuario/desafio/:idDesafio', async function(req
     response.json(result)
 })
 
+//Busca um desafio com a situação do usuário nele (usada na tela de detalhe).
+//Diferente da rota acima, funciona também quando o usuário ainda não entrou no desafio:
+//nesse caso id_usuario_desafio e status_desafio vêm como null
+router.get('/desafios/:idDesafio/usuario/:idUsuario', async function(request, response){
+    let idDesafio = request.params.idDesafio
+    let idUsuario = request.params.idUsuario
+
+    let result = await controllerDesafios.buscarDesafioDoUsuario(idDesafio, idUsuario)
+
+    response.status(result.status_code)
+    response.json(result)
+})
+
 //Busca um usuario_desafio
 router.get('/desafios/usuarioDesafio/:id', async function(request, response){
     let id = request.params.id
