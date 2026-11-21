@@ -1,270 +1,403 @@
-/*****************************************************************************
- * Objetivo: Arquivo responsável pela validação, tratamento e manipulação
-   de dados para o CRUD de post_curtida
- * Data: 03.11.2026
- * Autor: Riller
- * Versão: 1.0
- ****************************************************************************/
 
-//Import do arquivo de padronização de mensagens
 const config_message = require('../modulo/configMessages.js')
 
-//Import do arquivo DAO para fazer o CRUD do gênero no banco de dados
 const usuarioMissaoDAO = require('../../model/DAO/usuario_missao/usuario_missao.js')
 const controllerMissaoEtapa = require('./controller_missao_etapa.js')
-const controller_missao_categoria = require('./controller_missao_categoria.js')
+const controllerMissaoCategoria = require('./controller_missao_categoria.js')
 
-//Criar
-const inserirUsuarioMissao = async function(usuarioMissao, contentType) {
-    //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
+// Validar ID
+const validarId = function (id) {
+    return id !== '' &&
+        id !== null &&
+        id !== undefined &&
+        Number.isInteger(Number(id)) &&
+        Number(id) > 0
+}
+
+// Validar dados recebidos
+const validarDados = function (usuarioMissao) {
     let message = JSON.parse(JSON.stringify(config_message))
+
+    if (!usuarioMissao || typeof usuarioMissao !== 'object') {
+        message.ERROR_BAD_REQUEST.field = 'DADOS INVÁLIDOS'
+        return message.ERROR_BAD_REQUEST
+    }
+
+    if (!validarId(usuarioMissao.id_missao)) {
+        message.ERROR_BAD_REQUEST.field = '[ID MISSAO] INVÁLIDO'
+        return message.ERROR_BAD_REQUEST
+    }
+
+    if (!validarId(usuarioMissao.id_usuario)) {
+        message.ERROR_BAD_REQUEST.field = '[ID USUARIO] INVÁLIDO'
+        return message.ERROR_BAD_REQUEST
+    }
+
+    return false
+}
+
+// Inserir participação em uma missão
+const inserirUsuarioMissao = async function (usuarioMissao, contentType) {
+    let message = JSON.parse(JSON.stringify(config_message))
+
     try {
-        //validando content type
-        if(String(contentType).toUpperCase() == "APPLICATION/JSON"){
-            let validar = await validarDados(usuarioMissao)
-            if(validar)
-                return validar //400
-            else{
-                let result = await usuarioMissaoDAO.insertUsuarioMissao(usuarioMissao)
-                if(result){
-                    /*
-                        Criando o atributo ID no JSON do comentario e colocando
-                        o ID gerado após o insert
-                    */
-                usuarioMissao.id = result
-                message.DEFAULT_MESSAGE.status       = message.SUCCESS_CREATED_ITEM.status
-                message.DEFAULT_MESSAGE.status_code  = message.SUCCESS_CREATED_ITEM.status_code
-                message.DEFAULT_MESSAGE.message      = message.SUCCESS_CREATED_ITEM.message
-                message.DEFAULT_MESSAGE.response     = usuarioMissao //201
-                return message.DEFAULT_MESSAGE  //Retorno da mensagem do try
-                }else
-                    return message.ERROR_INTERNAL_SERVER_MODEL //500(banco de dados)
-            }
-        }else
-            return message.ERROR_CONTENT_TYPE //415 (retorna erro de tipo de dados) 
+        if (!String(contentType).toLowerCase().includes('application/json')) {
+            return message.ERROR_CONTENT_TYPE
+        }
+
+        const validar = validarDados(usuarioMissao)
+
+        if (validar) {
+            return validar
+        }
+
+        // Verificar se a missão já está cadastrada para o usuário
+        const participacaoExistente =
+            await usuarioMissaoDAO.selectByIdUsuarioByIdMissao(
+                usuarioMissao.id_missao,
+                usuarioMissao.id_usuario
+            )
+
+        if (!participacaoExistente) {
+            return message.ERROR_INTERNAL_SERVER_MODEL
+        }
+
+        // A procedure usa LEFT JOIN:
+        // status_missao NULL significa que ainda não participa.
+        if (
+            participacaoExistente.length > 0 &&
+            participacaoExistente[0].status_missao !== null
+        ) {
+            message.ERROR_BAD_REQUEST.field =
+                'USUÁRIO JÁ PARTICIPA DESTA MISSÃO'
+
+            return message.ERROR_BAD_REQUEST
+        }
+
+        const result = await usuarioMissaoDAO.insertUsuarioMissao(usuarioMissao)
+
+        if (!result) {
+            return message.ERROR_INTERNAL_SERVER_MODEL
+        }
+
+        usuarioMissao.id = result
+
+        message.DEFAULT_MESSAGE.status =
+            message.SUCCESS_CREATED_ITEM.status
+
+        message.DEFAULT_MESSAGE.status_code =
+            message.SUCCESS_CREATED_ITEM.status_code
+
+        message.DEFAULT_MESSAGE.message =
+            'Participação na missão realizada com sucesso.'
+
+        message.DEFAULT_MESSAGE.response = usuarioMissao
+
+        return message.DEFAULT_MESSAGE
+
+    } catch (error) {
+        console.log('Erro ao participar da missão:', error)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+// Concluir missão
+const atualizarUsuarioMissao = async function (usuarioMissao, id, contentType) {
+    let message = JSON.parse(JSON.stringify(config_message))
+
+    try {
+        if (!String(contentType).toLowerCase().includes('application/json')) {
+            return message.ERROR_CONTENT_TYPE
+        }
+
+        const validar = validarDados(usuarioMissao)
+
+        if (validar) {
+            return validar
+        }
+
+        const participacao =
+            await usuarioMissaoDAO.selectByIdUsuarioByIdMissao(
+                usuarioMissao.id_missao,
+                usuarioMissao.id_usuario
+            )
+
+        if (!participacao) {
+            return message.ERROR_INTERNAL_SERVER_MODEL
+        }
+
+        if (
+            participacao.length === 0 ||
+            participacao[0].status_missao === null
+        ) {
+            return message.ERROR_NOT_FOUND
+        }
+
+        if (participacao[0].status_missao === 'CONCLUIDA') {
+            message.ERROR_BAD_REQUEST.field = 'MISSÃO JÁ CONCLUÍDA'
+            return message.ERROR_BAD_REQUEST
+        }
+
+        if (participacao[0].status_missao !== 'EM_ANDAMENTO') {
+            message.ERROR_BAD_REQUEST.field =
+                'A MISSÃO NÃO ESTÁ EM ANDAMENTO'
+
+            return message.ERROR_BAD_REQUEST
+        }
+
+        const result = await usuarioMissaoDAO.updateUsuarioMissao(usuarioMissao)
+
+        if (!result) {
+            return message.ERROR_INTERNAL_SERVER_MODEL
+        }
+
+        message.DEFAULT_MESSAGE.status =
+            message.SUCCESS_UPDATE_ITEM.status
+
+        message.DEFAULT_MESSAGE.status_code =
+            message.SUCCESS_UPDATE_ITEM.status_code
+
+        message.DEFAULT_MESSAGE.message =
+            'Missão concluída com sucesso.'
+
+        message.DEFAULT_MESSAGE.response = usuarioMissao
+
+        return message.DEFAULT_MESSAGE
+
+    } catch (error) {
+        console.log('Erro ao concluir missão:', error)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+// Buscar participação pelo ID
+const buscarUsuarioMissao = async function (id) {
+    let message = JSON.parse(JSON.stringify(config_message))
+
+    try {
+        if (!validarId(id)) {
+            message.ERROR_BAD_REQUEST.field = '[ID] INVÁLIDO'
+            return message.ERROR_BAD_REQUEST
+        }
+
+        const result = await usuarioMissaoDAO.selectByIdUsuarioMissao(id)
+
+        if (!result) {
+            return message.ERROR_INTERNAL_SERVER_MODEL
+        }
+
+        if (result.length === 0) {
+            return message.ERROR_NOT_FOUND
+        }
+
+        await exibirCategoriasMissao(result)
+        await exibirEtapasMissao(result)
+
+        message.DEFAULT_MESSAGE.status =
+            message.SUCCESS_CREATED_ITEM.status
+
+        message.DEFAULT_MESSAGE.status_code =
+            message.SUCCESS_CREATED_ITEM.status_code
+
+        message.DEFAULT_MESSAGE.response.usuario_missao = result
+
+        return message.DEFAULT_MESSAGE
 
     } catch (error) {
         console.log(error)
-        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500(controller)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
 
-//Atualizar
-const atualizarUsuarioMissao = async function (usuarioMissao, id, contentType) {
-    //Criando um clone do objeto JSON para manipular sua estrutura sem modificar o arquivo original
-    let message = JSON.parse(JSON.stringify(config_message))
-    try {
-        //Validação do contentType para receber apenas JSON
-        if(String(contentType).toUpperCase() == 'APPLICATION/JSON'){
-            let resultBuscarID = await buscarUsuarioMissao(id)
-            if(resultBuscarID.status){
-                //Validação de campos obrigatórios para atualização (body)
-                let validar = await validarDados(usuarioMissao)
-                if(!validar){
-                    //Adicionando o atributo ID da categoria no JSON para ser enviado ao DAO
-                    usuarioMissao.id = id
-                    //Chama a função do DAO para atualizar a categoria
-                    let result = await usuarioMissaoDAO.updateUsuarioMissao(usuarioMissao)
-                    if(result){
-                        message.DEFAULT_MESSAGE.status      = message.SUCCESS_UPDATE_ITEM.status
-                        message.DEFAULT_MESSAGE.status_code = message.SUCCESS_UPDATE_ITEM.status_code
-                        message.DEFAULT_MESSAGE.message     = message.SUCCESS_UPDATE_ITEM.message
-                        message.DEFAULT_MESSAGE.response    = usuarioMissao
-                        return message.DEFAULT_MESSAGE //200 (Atualizado)
-                    }else
-                        return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
-                }else
-                    return validar
-            }else
-               return resultBuscarID //404, 400, 500 (resultBuscarId)
-        }else
-            return message.ERROR_CONTENT_TYPE //415(ContentType)
-    } catch (error) {
-        //console.log(error)
-        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
-    }
-}
-
-//Ler
-const buscarUsuarioMissao = async function (id) {
-    //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
-    let message = JSON.parse(JSON.stringify(config_message))
-    try {
-        //Validação para garantir que o id seja válido
-        if(id == '' || id == null || id == undefined || isNaN(id)){
-            message.ERROR_BAD_REQUEST.field = '[ID] INVÁLIDO' //400
-            return message.ERROR_BAD_REQUEST
-        }else{
-            let result = await usuarioMissaoDAO.selectByIdUsuarioMissao(id)
-            if(result){
-                await exibirCategoriasMissao(result)
-                await exibirEtapasMissao(result)
-                if(result.length > 0){
-                    message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
-                    message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.usuario_missao = result //201
-                    return message.DEFAULT_MESSAGE
-                }else{
-                    return message.ERROR_NOT_FOUND //404 (Não encontrado)
-                }
-            }else{
-               return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
-            }
-        }
-    } catch (error) {
-       return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
-    }    
-}
-
-//Ler
+// Buscar participações por missão
 const buscarUsuarioMissaoIdMissao = async function (idMissao) {
-    //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
+
     try {
-        //Validação para garantir que o id seja válido
-        if(idMissao == '' || idMissao == null || idMissao == undefined || isNaN(idMissao)){
-            message.ERROR_BAD_REQUEST.field = '[ID MISSAO] INVÁLIDO' //400
+        if (!validarId(idMissao)) {
+            message.ERROR_BAD_REQUEST.field = '[ID MISSAO] INVÁLIDO'
             return message.ERROR_BAD_REQUEST
-        }else{
-            let result = await usuarioMissaoDAO.selectUsuarioMissaoByIdMissao(idMissao)
-            if(result){
-                await exibirCategoriasMissao(result)
-                await exibirEtapasMissao(result)
-                if(result.length > 0){
-                    message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
-                    message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.usuario_missao = result //201
-                    return message.DEFAULT_MESSAGE
-                }else{
-                    return message.ERROR_NOT_FOUND //404 (Não encontrado)
-                }
-            }else{
-               return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
-            }
         }
+
+        const result =
+            await usuarioMissaoDAO.selectUsuarioMissaoByIdMissao(idMissao)
+
+        if (!result) {
+            return message.ERROR_INTERNAL_SERVER_MODEL
+        }
+
+        if (result.length === 0) {
+            return message.ERROR_NOT_FOUND
+        }
+
+        await exibirCategoriasMissao(result)
+        await exibirEtapasMissao(result)
+
+        message.DEFAULT_MESSAGE.status =
+            message.SUCCESS_CREATED_ITEM.status
+
+        message.DEFAULT_MESSAGE.status_code =
+            message.SUCCESS_CREATED_ITEM.status_code
+
+        message.DEFAULT_MESSAGE.response.usuario_missao = result
+
+        return message.DEFAULT_MESSAGE
+
     } catch (error) {
-        //console.log(error)
-       return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
-    }    
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
 }
 
-//Ler
+// Buscar participações por usuário
 const buscarUsuarioMissaoIdUsuario = async function (idUsuario) {
-    //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
+
     try {
-        //Validação para garantir que o id seja válido
-        if(idUsuario == '' || idUsuario == null || idUsuario == undefined || isNaN(idUsuario)){
-            message.ERROR_BAD_REQUEST.field = '[ID USUARIO] INVÁLIDO' //400
+        if (!validarId(idUsuario)) {
+            message.ERROR_BAD_REQUEST.field = '[ID USUARIO] INVÁLIDO'
             return message.ERROR_BAD_REQUEST
-        }else{
-            let result = await usuarioMissaoDAO.selectUsuarioMissaoByIdUsuario(idUsuario)
-            if(result){
-                await exibirCategoriasMissao(result)
-                await exibirEtapasMissao(result)
-                if(result.length > 0){
-                    message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
-                    message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.usuario_missao = result //201
-                    return message.DEFAULT_MESSAGE
-                }else{
-                    return message.ERROR_NOT_FOUND //404 (Não encontrado)
-                }
-            }else{
-                return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
-            }
         }
+
+        const result =
+            await usuarioMissaoDAO.selectUsuarioMissaoByIdUsuario(idUsuario)
+
+        if (!result) {
+            return message.ERROR_INTERNAL_SERVER_MODEL
+        }
+
+        if (result.length === 0) {
+            return message.ERROR_NOT_FOUND
+        }
+
+        await exibirCategoriasMissao(result)
+        await exibirEtapasMissao(result)
+
+        message.DEFAULT_MESSAGE.status =
+            message.SUCCESS_CREATED_ITEM.status
+
+        message.DEFAULT_MESSAGE.status_code =
+            message.SUCCESS_CREATED_ITEM.status_code
+
+        message.DEFAULT_MESSAGE.response.usuario_missao = result
+
+        return message.DEFAULT_MESSAGE
+
     } catch (error) {
-        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
-    }    
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
 }
 
-//Ler
+// Buscar participação por usuário e missão
 const buscarUsuarioMissaoIdUsuarioIdMissao = async function (idUsuario, idMissao) {
-    //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
+
     try {
-        //Validação para garantir que o id seja válido
-        if(idUsuario == '' || idUsuario == null || idUsuario == undefined || isNaN(idUsuario)){
-            message.ERROR_BAD_REQUEST.field = '[ID USUARIO] INVÁLIDO' //400
+        if (!validarId(idUsuario)) {
+            message.ERROR_BAD_REQUEST.field = '[ID USUARIO] INVÁLIDO'
             return message.ERROR_BAD_REQUEST
-        }else if(idMissao == '' || idMissao == null || idMissao == undefined || isNaN(idMissao)){
-            message.ERROR_BAD_REQUEST.field = '[ID MISSAO] INVÁLIDO' //400
-            return message.ERROR_BAD_REQUEST
-        }else{
-            let result = await usuarioMissaoDAO.selectByIdUsuarioByIdMissao(idMissao, idUsuario)
-            if(result){
-                await exibirCategoriasMissao(result)
-                await exibirEtapasMissao(result)
-                if(result.length > 0){
-                    message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
-                    message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.usuario_missao = result //201
-                    return message.DEFAULT_MESSAGE
-                }else{
-                    return message.ERROR_NOT_FOUND //404 (Não encontrado)
-                }
-            }else{
-                return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
-            }
         }
+
+        if (!validarId(idMissao)) {
+            message.ERROR_BAD_REQUEST.field = '[ID MISSAO] INVÁLIDO'
+            return message.ERROR_BAD_REQUEST
+        }
+
+        const result =
+            await usuarioMissaoDAO.selectByIdUsuarioByIdMissao(
+                idMissao,
+                idUsuario
+            )
+
+        if (!result) {
+            return message.ERROR_INTERNAL_SERVER_MODEL
+        }
+
+        if (result.length === 0) {
+            return message.ERROR_NOT_FOUND
+        }
+
+        await exibirCategoriasMissao(result)
+        await exibirEtapasMissao(result)
+
+        message.DEFAULT_MESSAGE.status =
+            message.SUCCESS_CREATED_ITEM.status
+
+        message.DEFAULT_MESSAGE.status_code =
+            message.SUCCESS_CREATED_ITEM.status_code
+
+        message.DEFAULT_MESSAGE.response.usuario_missao = result
+
+        return message.DEFAULT_MESSAGE
+
     } catch (error) {
-        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
-    }    
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
 }
 
-//Excluir
+// Excluir participação
 const excluirUsuarioMissao = async function (id) {
     let message = JSON.parse(JSON.stringify(config_message))
+
     try {
-        let result = await usuarioMissaoDAO.deleteUsuarioMissao(id)
-        if (result) {
-            message.DEFAULT_MESSAGE.status      = message.SUCCESS_DELETED_ITEM.status
-            message.DEFAULT_MESSAGE.status_code = message.SUCCESS_DELETED_ITEM.status_code
-            message.DEFAULT_MESSAGE.message     = message.SUCCESS_DELETED_ITEM.message
-            return message.DEFAULT_MESSAGE
-        } else {
-            return message.ERROR_NOT_FOUND //404 (não existia curtida desse usuário nesse post)
+        if (!validarId(id)) {
+            message.ERROR_BAD_REQUEST.field = '[ID] INVÁLIDO'
+            return message.ERROR_BAD_REQUEST
         }
+
+        const result = await usuarioMissaoDAO.deleteUsuarioMissao(id)
+
+        if (!result) {
+            return message.ERROR_NOT_FOUND
+        }
+
+        message.DEFAULT_MESSAGE.status =
+            message.SUCCESS_DELETED_ITEM.status
+
+        message.DEFAULT_MESSAGE.status_code =
+            message.SUCCESS_DELETED_ITEM.status_code
+
+        message.DEFAULT_MESSAGE.message =
+            message.SUCCESS_DELETED_ITEM.message
+
+        return message.DEFAULT_MESSAGE
+
     } catch (error) {
-        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
 
-//Exibir categorias da missao
-const exibirCategoriasMissao = async function(result){
-    for(const missoes of result){
-        //Cria o objeto de categorias relacionados a missao
-        let resultCategoria = await controller_missao_categoria.buscarMissaoCategoriaIdMissao(missoes.id_missao)
-        if(resultCategoria.status){
-            missoes.categoria = resultCategoria.response.missao_categoria
+// Anexar categorias às missões
+const exibirCategoriasMissao = async function (result) {
+    for (const missao of result) {
+        const resultCategoria =
+            await controllerMissaoCategoria.buscarMissaoCategoriaIdMissao(
+                missao.id_missao
+            )
+
+        if (resultCategoria && resultCategoria.status) {
+            missao.categoria =
+                resultCategoria.response.missao_categoria
         }
     }
 }
 
-const exibirEtapasMissao = async function(result){
-    for(const missoes of result){
-        let resultEtapas = await controllerMissaoEtapa.buscarEtapasMissaoIdMissao(missoes.id_missao)
-        if(resultEtapas.status){
-            missoes.etapas = resultEtapas.response.etapas_missao
+// Anexar etapas às missões
+const exibirEtapasMissao = async function (result) {
+    for (const missao of result) {
+        const resultEtapas =
+            await controllerMissaoEtapa.buscarEtapasMissaoIdMissao(
+                missao.id_missao
+            )
+
+        if (resultEtapas && resultEtapas.status) {
+            missao.etapas =
+                resultEtapas.response.etapas_missao
         }
     }
-}
-
-//Função de validação (não há a necessidade de exporta-la)
-const validarDados = async function (usuarioMissao) {
-    //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar o arquivo original
-    let message = JSON.parse(JSON.stringify(config_message))
-
-    //Validação de dados para os atributos do usuario_missao (400)
-    if (usuarioMissao.id_missao == '' || usuarioMissao.id_missao == null || usuarioMissao.id_missao == undefined || isNaN(usuarioMissao.id_missao)) {
-        message.ERROR_BAD_REQUEST.field = '[ID_MISSAO] INVÁLIDO' //400
-        return message.ERROR_BAD_REQUEST
-    } else if (usuarioMissao.id_usuario == '' || usuarioMissao.id_usuario == null || usuarioMissao.id_usuario == undefined || isNaN(usuarioMissao.id_usuario)) {
-        message.ERROR_BAD_REQUEST.field = '[ID_USUARIO] INVÁLIDO' //400
-        return message.ERROR_BAD_REQUEST
-    } else
-        return false
 }
 
 module.exports = {
@@ -274,5 +407,5 @@ module.exports = {
     buscarUsuarioMissaoIdMissao,
     buscarUsuarioMissaoIdUsuario,
     buscarUsuarioMissaoIdUsuarioIdMissao,
-    excluirUsuarioMissao,
+    excluirUsuarioMissao
 }

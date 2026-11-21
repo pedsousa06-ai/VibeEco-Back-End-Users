@@ -1,64 +1,69 @@
-//importando o express
-const express = require("express")
-const bodyParser    = require("body-parser")
 
-//criando um objeto para manipular dados do body da API em formato Json
-const bodyParserJson = bodyParser.json()
-
-//cria um objeto de rota para o arquivo
+const express = require('express')
 const router = express.Router()
 
-const controllerUsuarioMissao = require("../../controller/missao/controller_usuario_missao.js")
+const controller = require('../../controller/missao/controller_usuario_missao.js')
 
-router.post('/usuarioMissao', bodyParserJson, async function(request, response){
-    //Recebe o conteúdo dentro do body da requisição (Abrindo o envelope e guardando o conteúdo da requisição)
-    let dados = request.body
-    let contentType = request.headers['content-type']
-    let result = await controllerUsuarioMissao.inserirUsuarioMissao(dados, contentType)
-    response.status(result.status_code)
-    response.json(result)
+// Resposta padronizada
+const enviarResposta = function (res, result) {
+    const statusCode =
+        result && result.status_code
+            ? result.status_code
+            : 500
+
+    return res.status(statusCode).json(
+        result || {
+            status: false,
+            message: 'Erro desconhecido.'
+        }
+    )
+}
+
+// Participar de uma missão
+router.post('/usuario_missao', async function (req, res) {
+    try {
+        const contentType = req.headers['content-type']
+        const dados = req.body
+
+        const result = await controller.inserirUsuarioMissao(
+            dados,
+            contentType
+        )
+
+        return enviarResposta(res, result)
+
+    } catch (error) {
+        console.error('Erro na rota de participação:', error)
+
+        return res.status(500).json({
+            status: false,
+            message: 'Erro interno ao participar da missão.'
+        })
+    }
 })
 
-router.get('/usuarioMissaoIdMissao/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerUsuarioMissao.buscarUsuarioMissaoIdMissao(id)
-    response.status(result.status_code)
-    response.json(result)
+// Concluir uma missão
+router.put('/usuario_missao/concluir', async function (req, res) {
+    try {
+        const contentType = req.headers['content-type']
+        const dados = req.body
+
+        const result = await controller.atualizarUsuarioMissao(
+            dados,
+            null,
+            contentType
+        )
+
+        return enviarResposta(res, result)
+
+    } catch (error) {
+        console.error('Erro na rota de conclusão:', error)
+
+        return res.status(500).json({
+            status: false,
+            message: 'Erro interno ao concluir a missão.'
+        })
+    }
 })
 
-router.get('/usuarioMissaoIdUsuario/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerUsuarioMissao.buscarUsuarioMissaoIdUsuario(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-router.get('/usuarioMissao/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerUsuarioMissao.buscarUsuarioMissao(id)
-    response.status(result.status_code)
-    response.json(result)
-})
-
-//Retorna a missão de um usuário específico
-router.get('/usuario/:idUsuario/missao/:idMissao', async function(request, response){
-    //Recebe os ids pela URL
-    let idUsuario = request.params.idUsuario
-    let idMissao  = request.params.idMissao
-
-    //Chama a controller
-    let result = await controllerUsuarioMissao.buscarUsuarioMissaoIdUsuarioIdMissao(idUsuario, idMissao)
-
-    response.status(result.status_code)
-    response.json(result)
-})
-
-router.delete('/usuarioMissao/:id', bodyParserJson, async function (request, response) {
-    let id      = request.params.id
-    let result  = await controllerUsuarioMissao.excluirUsuarioMissao(id)
-    response.status(result.status_code)
-    response.json(result) 
-})
-
-// Exporta as rotas para o app.js
 module.exports = router

@@ -1,137 +1,149 @@
-/*******************************************************************************************************
- * 
- * Objetivo: Arquivo responsável pelo CRUD no Banco de dados MySQL na tabela 
- * usuario_missao
- * Data: 12/11/2026
- * Autor: Riller
- * Versão: 1.0
- * 
- *******************************************************************************************************/
 
-//Import da biblioteca para gerenciar o banco de dados MySql no node.js
 const knex = require('knex')
-
-//Import do arquivo de configuração para conexão com o banco de dados MySql
 const knexConfig = require('../../database_config_knex/knex_file.js')
 
-//Criar a conexão com o banco de dados MySql
 const knexConex = knex(knexConfig.development)
 
-//Função para inserir dados em tabela
+// Inserir participação em uma missão
 const insertUsuarioMissao = async function (usuario_missao) {
     try {
-        let sql = `insert into tbl_usuario_missao (
-            id_usuario,
-            id_missao,
-            data_conclusao
-        )values(
-            '${usuario_missao.id_usuario}',
-            '${usuario_missao.id_missao}',
-            null
-        );`
-        let result = await knexConex.raw(sql)
-        if (result)
-            return result[0].insertId
-        else
-            return false
+        const sql = `
+            INSERT INTO tbl_usuario_missao
+                (id_usuario, id_missao, status, progresso)
+            VALUES (?, ?, 'EM_ANDAMENTO', 0)
+        `
+
+        const result = await knexConex.raw(sql, [
+            usuario_missao.id_usuario,
+            usuario_missao.id_missao
+        ])
+
+        return result[0].insertId || false
+
     } catch (error) {
-        //console.log(error)
+        console.log('Erro ao inserir participação:', error)
         return false
     }
 }
 
-//Função para atualizar os dados da tabela
+// Concluir missão
 const updateUsuarioMissao = async function (usuario_missao) {
     try {
-        let sql = `update tbl_usuario_missao set
-        id_usuario      =  ${usuario_missao.id_usuario},
-        id_missao       = '${usuario_missao.id_missao}',
-        status          = '${usuario_missao.status}',
-        data_conclusao  = now()
-        where id        =   ${usuario_missao.id};`
+        const sql = `
+            UPDATE tbl_usuario_missao
+            SET
+                status = 'CONCLUIDA',
+                progresso = 100,
+                data_conclusao = NOW()
+            WHERE
+                id_usuario = ?
+                AND id_missao = ?
+                AND status = 'EM_ANDAMENTO'
+        `
 
-        let result = await knexConex.raw(sql)
-        if (result){
-            return true
-        }
-        else
-            return false
+        const result = await knexConex.raw(sql, [
+            usuario_missao.id_usuario,
+            usuario_missao.id_missao
+        ])
+
+        return result[0].affectedRows > 0
+
     } catch (error) {
-        //console.log(error)
+        console.log('Erro ao concluir missão:', error)
         return false
     }
 }
 
-//Select com critério de filtro o id do post
+// Buscar participações pelo ID da missão
 const selectUsuarioMissaoByIdMissao = async function (id_missao) {
     try {
-        //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarMissaoIdMissao(${id_missao})`
-        let result = await knexConex.raw(sql)
+        const sql = `CALL procListarMissaoIdMissao(?)`
+        const result = await knexConex.raw(sql, [id_missao])
+
         if (Array.isArray(result)) {
             return result[0][0]
-        } else
-            return false
+        }
+
+        return false
+
     } catch (error) {
+        console.log('Erro ao buscar participações por missão:', error)
         return false
     }
 }
 
-//Read
+// Buscar participações pelo ID do usuário
 const selectUsuarioMissaoByIdUsuario = async function (id_usuario) {
     try {
-        //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarMissaoIdUsuario(${id_usuario});`
-        let result = await knexConex.raw(sql)
+        const sql = `CALL procListarMissaoIdUsuario(?)`
+        const result = await knexConex.raw(sql, [id_usuario])
+
         if (Array.isArray(result)) {
             return result[0][0]
-        } else
-            return false
+        }
+
+        return false
+
     } catch (error) {
+        console.log('Erro ao buscar participações por usuário:', error)
         return false
     }
 }
 
-//Read
+// Buscar participação pelo ID do registro
 const selectByIdUsuarioMissao = async function (id) {
     try {
-        //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarMissaoUsuarioMissao(${id});`
-        let result = await knexConex.raw(sql)
+        const sql = `CALL procListarMissaoUsuarioMissao(?)`
+        const result = await knexConex.raw(sql, [id])
+
         if (Array.isArray(result)) {
             return result[0][0]
-        } else
-            return false
+        }
+
+        return false
+
     } catch (error) {
+        console.log('Erro ao buscar participação:', error)
         return false
     }
 }
 
-//Read
+// Buscar participação por missão e usuário
 const selectByIdUsuarioByIdMissao = async function (id_missao, id_usuario) {
     try {
-        //Comando para buscar o id (int) tendo como parâmetro o id solicitado na função
-        let sql = `call procListarMissaoIdMissaoIdUsuario(${id_missao},${id_usuario});`
-        let result = await knexConex.raw(sql)
+        const sql = `CALL procListarMissaoIdMissaoIdUsuario(?, ?)`
+
+        const result = await knexConex.raw(sql, [
+            id_missao,
+            id_usuario
+        ])
+
         if (Array.isArray(result)) {
             return result[0][0]
-        } else
-            return false
+        }
+
+        return false
+
     } catch (error) {
+        console.log('Erro ao buscar participação específica:', error)
         return false
     }
 }
 
-//Delete
+// Excluir participação
 const deleteUsuarioMissao = async function (id) {
     try {
-        let sql = `delete from tbl_usuario_missao where id = ${id};`
-        let result = await knexConex.raw(sql)
-        if (result) {
-            return true
-        } else
-            return false
+        const sql = `
+            DELETE FROM tbl_usuario_missao
+            WHERE id = ?
+        `
+
+        const result = await knexConex.raw(sql, [id])
+
+        return result[0].affectedRows > 0
+
     } catch (error) {
+        console.log('Erro ao excluir participação:', error)
         return false
     }
 }

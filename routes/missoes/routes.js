@@ -1,46 +1,101 @@
-//importando o express
-const express = require("express")
-const bodyParser    = require("body-parser")
 
-//criando um objeto para manipular dados do body da API em formato Json
-const bodyParserJson = bodyParser.json()
-
-//cria um objeto de rota para o arquivo
+const express = require('express')
 const router = express.Router()
 
 const controllerMissoes = require('../../controller/missao/controller_missao.js')
 
-//Todas as missoes
-router.get('/missoes/todasmissoes/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerMissoes.ListarTodasMissoes(id)
-    response.status(result.status_code)
-    response.json(result)
+// Resposta padronizada
+const enviarResposta = function (res, result) {
+    const statusCode =
+        result && result.status_code
+            ? result.status_code
+            : 500
+
+    return res.status(statusCode).json(
+        result || {
+            status: false,
+            message: 'Erro desconhecido.'
+        }
+    )
+}
+
+// Todas as missões
+router.get('/missoes/todasmissoes/:id', async function (request, response) {
+    try {
+        const id = request.params.id
+
+        const result = await controllerMissoes.ListarTodasMissoes(id)
+
+        return enviarResposta(response, result)
+
+    } catch (error) {
+        console.error('Erro ao listar todas as missões:', error)
+
+        return response.status(500).json({
+            status: false,
+            message: 'Erro interno.'
+        })
+    }
 })
 
-//Todas as missoes disponiveis
-router.get('/missoes/missoesDisponiveis/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerMissoes.ListarTodasMissoesDisponiveis(id)
-    response.status(result.status_code)
-    response.json(result)
+// Missões disponíveis
+router.get('/missoes/missoesDisponiveis/:id', async function (request, response) {
+    try {
+        const id = request.params.id
+
+        const result =
+            await controllerMissoes.ListarTodasMissoesDisponiveis(id)
+
+        return enviarResposta(response, result)
+
+    } catch (error) {
+        console.error('Erro ao listar missões disponíveis:', error)
+
+        return response.status(500).json({
+            status: false,
+            message: 'Erro interno.'
+        })
+    }
 })
 
-//Todas as missoes em andamento
-router.get('/missoes/missoesAndamento/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerMissoes.ListarTodasMissoesEmAndamento(id)
-    response.status(result.status_code)
-    response.json(result)
+// Missões em andamento
+router.get('/missoes/missoesAndamento/:id', async function (request, response) {
+    try {
+        const id = request.params.id
+
+        const result =
+            await controllerMissoes.ListarTodasMissoesEmAndamento(id)
+
+        return enviarResposta(response, result)
+
+    } catch (error) {
+        console.error('Erro ao listar missões em andamento:', error)
+
+        return response.status(500).json({
+            status: false,
+            message: 'Erro interno.'
+        })
+    }
 })
 
-//Todas as missoes concluidas
-router.get('/missoes/missoesConcluidas/:id', async function(request, response){
-    let id = request.params.id
-    let result = await controllerMissoes.ListarTodasMissoesConcluidas(id)
-    response.status(result.status_code)
-    response.json(result)
+// Missões concluídas
+router.get('/missoes/missoesConcluidas/:id', async function (request, response) {
+    try {
+        const id = request.params.id
+
+        const result =
+            await controllerMissoes.ListarTodasMissoesConcluidas(id)
+
+        return enviarResposta(response, result)
+
+    } catch (error) {
+        console.error('Erro ao listar missões concluídas:', error)
+
+        return response.status(500).json({
+            status: false,
+            message: 'Erro interno.'
+        })
+    }
 })
 
-// Exporta as rotas para o app.js
 module.exports = router

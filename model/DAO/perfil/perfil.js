@@ -1,17 +1,13 @@
 /*******************************************************************************************************
- * Objetivo: Consultas da tela de Perfil do usuário (dados, desempenho, evolução de XP e conquistas)
- * Todas as consultas usam parâmetros (?) e devolvem false quando o banco dá erro.
- * Pré-requisito no banco: Scripts/migracao_perfil.sql (nome_publico, curso, localizacao, bio,
- * matricula, data_cadastro) e a view vwHistoricoUsuario (SelectsUSER.sql).
+ * Objetivo: Consultas da tela de Perfil do usuário
  *******************************************************************************************************/
 const knex = require('knex')
 const knexConfig = require('../../database_config_knex/knex_file.js')
 const knexConex = knex(knexConfig.development)
 
-// raw() do mysql2 devolve [linhas, campos]
 const linhas = (result) => (Array.isArray(result) ? result[0] : false)
 
-// Dados do usuário + nível + instituição + escolaridade
+// Dados do usuário
 const selectPerfilById = async function (id) {
     try {
         const sql = `
@@ -26,49 +22,51 @@ const selectPerfilById = async function (id) {
             LEFT JOIN tbl_instituicao i ON i.id = u.id_instituicao
             LEFT JOIN tbl_escolaridade e ON e.id = u.id_escolaridade
             WHERE u.id = ?`
-        return linhas(await knexConex.raw(sql, [id]))
+        return linhas(await knexConex.raw(sql, [Number(id)]))
     } catch (error) {
         console.log(error)
         return false
     }
 }
 
-// XP e moedas ganhos e missões concluídas nos últimos N dias (dias = null: desde o início)
+// XP e moedas
 const selectGanhosPeriodo = async function (id, dias) {
     try {
-        const filtro = dias === null ? '' : 'AND data_evento >= DATE_SUB(NOW(), INTERVAL ? DAY)'
-        const bind = dias === null ? [id] : [id, dias]
+        const filtro = dias === null ? '' : `AND data_evento >= DATE_SUB(NOW(), INTERVAL ${Number(dias)} DAY)`
         const sql = `
             SELECT COALESCE(SUM(xp), 0) AS xp,
                    COALESCE(SUM(CASE WHEN mc > 0 THEN mc ELSE 0 END), 0) AS mc,
                    COALESCE(SUM(tipo = 'missao'), 0) AS missoes
             FROM vwHistoricoUsuario
-            WHERE id_usuario = ? AND data_evento IS NOT NULL AND data_evento <= NOW() ${filtro}`
-        return linhas(await knexConex.raw(sql, bind))
+            WHERE id_usuario = ? 
+              AND data_evento IS NOT NULL 
+              AND data_evento <= NOW() ${filtro}`
+        return linhas(await knexConex.raw(sql, [Number(id)]))
     } catch (error) {
         console.log(error)
         return false
     }
 }
 
-// XP por semana nas últimas 12 semanas (semana_atras 0 = semana atual)
+// XP por semana
 const selectXpPorSemana = async function (id) {
     try {
         const sql = `
             SELECT FLOOR(DATEDIFF(CURDATE(), DATE(data_evento)) / 7) AS semana_atras,
                    COALESCE(SUM(xp), 0) AS xp
             FROM vwHistoricoUsuario
-            WHERE id_usuario = ? AND data_evento IS NOT NULL
+            WHERE id_usuario = ? 
+              AND data_evento IS NOT NULL
               AND data_evento <= NOW() AND data_evento >= DATE_SUB(CURDATE(), INTERVAL 83 DAY)
             GROUP BY semana_atras`
-        return linhas(await knexConex.raw(sql, [id]))
+        return linhas(await knexConex.raw(sql, [Number(id)]))
     } catch (error) {
         console.log(error)
         return false
     }
 }
 
-// Posição no ranking (por XP, só quem aparece no ranking) e total de participantes
+// Posição no ranking
 const selectPosicaoRanking = async function (id) {
     try {
         const sql = `
@@ -78,14 +76,14 @@ const selectPosicaoRanking = async function (id) {
                 (SELECT COUNT(*) FROM tbl_usuario WHERE exibir_ranking = TRUE) AS total,
                 me.exibir_ranking AS aparece
             FROM tbl_usuario me WHERE me.id = ?`
-        return linhas(await knexConex.raw(sql, [id]))
+        return linhas(await knexConex.raw(sql, [Number(id)]))
     } catch (error) {
         console.log(error)
         return false
     }
 }
 
-// Todas as conquistas, marcando as que o usuário já tem (mais recentes primeiro)
+// Conquistas
 const selectConquistasComSituacao = async function (id) {
     try {
         const sql = `
@@ -94,20 +92,20 @@ const selectConquistasComSituacao = async function (id) {
             LEFT JOIN tbl_usuario_conquista uc ON uc.id_conquista = c.id AND uc.id_usuario = ?
             GROUP BY c.id, c.nome, c.descricao, c.img
             ORDER BY (MAX(uc.data_conquista) IS NULL), MAX(uc.data_conquista) DESC, c.id`
-        return linhas(await knexConex.raw(sql, [id]))
+        return linhas(await knexConex.raw(sql, [Number(id)]))
     } catch (error) {
         console.log(error)
         return false
     }
 }
 
-// Atualiza só os campos editáveis do perfil (nome público, curso, localização, bio e nome)
+// Atualiza o perfil
 const updatePerfil = async function (id, d) {
     try {
         const sql = `UPDATE tbl_usuario
                      SET nome = ?, nome_publico = ?, curso = ?, localizacao = ?, bio = ?
                      WHERE id = ?`
-        await knexConex.raw(sql, [d.nome, d.nomePublico, d.curso, d.localizacao, d.bio, id])
+        await knexConex.raw(sql, [d.nome, d.nomePublico, d.curso, d.localizacao, d.bio, Number(id)])
         return true
     } catch (error) {
         console.log(error)

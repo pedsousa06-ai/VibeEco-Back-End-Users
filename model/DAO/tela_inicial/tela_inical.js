@@ -36,21 +36,35 @@ const selectDadosInicioByIdUsuario = async function(id){
 
 //retorna todas as missoes em andamento
 const selectMissoesAndamentoByIdUsuario = async function(id){
-
     try {
+        // SELECT direto, sem procedure
+        let sql = `
+            SELECT 
+                um.id_usuario,
+                um.id_missao,
+                m.nome AS nome_missao,
+                m.descricao AS descricao_missao,
+                m.total_xp_missao AS xp_missao,
+                um.status AS status_missao,
+                um.progresso AS progresso_missao,
+                DATEDIFF(m.data_termino, CURDATE()) AS prazo_dias,
+                d.nome AS nome_dificuldade
+            FROM tbl_usuario_missao um
+            INNER JOIN tbl_missao m ON m.id = um.id_missao
+            LEFT JOIN tbl_dificuldade d ON d.id = m.id_dificuldade
+            WHERE um.id_usuario = ? AND um.status = 'EM_ANDAMENTO'
+        `;
+        
+        let result = await knexConex.raw(sql, [id]);
 
-        //enviando para o banco de dados
-        let result = await knexConex.raw('call procListarMissaoEmAndamento(?)', [id])
-        //Verificando se é um array
         if(Array.isArray(result)){
-
-            return result[0][0]
+            return result[0]; // O knex retorna os dados na posição 0
         }else{
-            return false
+            return false;
         }
     } catch (error) {
-        //console.log(error)
-        return false
+        console.log(error);
+        return false;
     }
 }
 

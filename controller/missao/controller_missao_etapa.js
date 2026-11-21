@@ -1,74 +1,65 @@
 /*****************************************************************************
- * Objetivo: Arquivo responsável pela validação, tratamento e manipulação de dados
- * Data: 17.11.2026
- * Autor: Riller
- * Versão: 1.0
+ * Objetivo: Controller de Etapas da Missão
  ****************************************************************************/
-
-//Import do arquivo de padronização de mensagens
 const config_message = require('../modulo/configMessages.js')
-
-//Import do arquivo DAO para fazer o CRUD do gênero no banco de dados
 const missaoEtapaDAO = require('../../model/DAO/missao_etapa/missao_etapa.js')
 
-//Ler
 const buscarEtapasMissaoIdMissao = async function (idMissao) {
-    //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
-        //Validação para garantir que o id seja válido
-        if(idMissao == '' || idMissao == null || idMissao == undefined || isNaN(idMissao)){
-            message.ERROR_BAD_REQUEST.field = '[ID MISSAO] INVÁLIDO' //400
+        if (idMissao == '' || idMissao == null || idMissao == undefined || isNaN(idMissao)) {
+            message.ERROR_BAD_REQUEST.field = '[ID MISSAO] INVÁLIDO'
             return message.ERROR_BAD_REQUEST
-        }else{
+        } else {
             let result = await missaoEtapaDAO.selectMissaoEtapaByIdMissao(idMissao)
-            if(result){
-                if(result.length > 0){
+            if (result) {
+                if (result.length > 0) {
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.etapas_missao = result //201
+                    // Retorna o array de etapas direto
+                    message.DEFAULT_MESSAGE.response.etapas_missao = result 
                     return message.DEFAULT_MESSAGE
-                }else{
-                    return message.ERROR_NOT_FOUND //404 (Não encontrado)
+                } else {
+                    return message.ERROR_NOT_FOUND
                 }
-            }else{
-                return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
+            } else {
+                return message.ERROR_INTERNAL_SERVER_MODEL
             }
         }
     } catch (error) {
-        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
-    }    
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
 }
 
-//Ler
 const buscarEtapaMissao = async function (idEtapa) {
-    //Criando um clone do objeto JSON para manipular a sua estrutura local sem modificar a estrutura original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
-        //Validação para garantir que o id seja válido
-        if(idEtapa == '' || idEtapa == null || idEtapa == undefined || isNaN(idEtapa)){
-            message.ERROR_BAD_REQUEST.field = '[ID ETAPA] INVÁLIDO' //400
+        if (idEtapa == '' || idEtapa == null || idEtapa == undefined || isNaN(idEtapa)) {
+            message.ERROR_BAD_REQUEST.field = '[ID ETAPA] INVÁLIDO'
             return message.ERROR_BAD_REQUEST
-        }else{
+        } else {
             let result = await missaoEtapaDAO.selectByIdMissaoEtapa(idEtapa)
-            if(result){
-                if(result.length > 0){
+            if (result) {
+                if (result.length > 0) {
                     message.DEFAULT_MESSAGE.status = message.SUCCESS_CREATED_ITEM.status
                     message.DEFAULT_MESSAGE.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                    message.DEFAULT_MESSAGE.response.etapas_missao = result //201
+                    message.DEFAULT_MESSAGE.response.etapas_missao = result
                     return message.DEFAULT_MESSAGE
-                }else{
-                    return message.ERROR_NOT_FOUND //404 (Não encontrado)
+                } else {
+                    return message.ERROR_NOT_FOUND
                 }
-            }else{
-                return message.ERROR_INTERNAL_SERVER_MODEL //500 (banco de dados)
+            } else {
+                return message.ERROR_INTERNAL_SERVER_MODEL
             }
         }
     } catch (error) {
-        return message.ERROR_INTERNAL_SERVER_CONTROLLER //500 (controller)
-    }    
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
 }
 
 module.exports = {
-    buscarEtapasMissaoIdMissao, buscarEtapaMissao
+    buscarEtapasMissaoIdMissao,
+    buscarEtapaMissao
 }

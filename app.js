@@ -1,4 +1,3 @@
-
 /***************************************************************
  * Objetivo: API centralizada do VibeEco
  * Autor: Riller Feitosa
@@ -24,6 +23,24 @@ const corsOption = {
 }
 
 app.use(cors(corsOption))
+
+// ============================================================
+// MIDDLEWARE SALVADOR: Converte qualquer ID da URL para Número
+// Isso resolve o erro 500 de collation em TODAS as rotas de uma vez
+// ============================================================
+app.use((req, res, next) => {
+    if (req.params) {
+        Object.keys(req.params).forEach(key => {
+            // Se a chave começar com "id" ou terminar com "Id", converte para número
+            if (key.toLowerCase().startsWith("id") || key.toLowerCase().endsWith("id")) {
+                if (!isNaN(req.params[key])) {
+                    req.params[key] = Number(req.params[key])
+                }
+            }
+        })
+    }
+    next()
+})
 
 // ROTA BASE DA API
 const API_BASE = "/v1/senai/vibeEco"
@@ -78,19 +95,20 @@ app.use(API_BASE, historicoRouter)
 
 // NOTIFICAÇÕES
 const notificacaoRouter = require("./routes/notificacao/routes.js")
-
 console.log("Router de notificações:", typeof notificacaoRouter)
-
 app.use(API_BASE, notificacaoRouter)
 
-
 // CONTEÚDOS EDUCATIVOS
-const conteudoEducativoRouter = require(
-    "./routes/conteudo_educativo/routes.js"
-)
-
+const conteudoEducativoRouter = require("./routes/conteudo_educativo/routes.js")
 app.use(API_BASE, conteudoEducativoRouter)
 
+// ============================================================
+// TRATAMENTO DE ERRO GLOBAL (Opcional, mas ajuda a ver o erro)
+// ============================================================
+app.use((err, req, res, next) => {
+    console.error("ERRO GLOBAL CAPTURADO:", err)
+    res.status(500).json({ error: "Erro interno no servidor", detalhe: err.message })
+})
 
 // INICIALIZAÇÃO DA API
 app.listen(8080, function() {
