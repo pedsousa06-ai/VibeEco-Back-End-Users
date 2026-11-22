@@ -1,38 +1,83 @@
-// routes/ranking/router_ranking.js
+
 const express = require('express')
 const controllerRanking = require('../../controller/ranking/controller_ranking.js')
 
 const router = express.Router()
 
-router.get('/ranking', async (request, response) => {
+// RANKING GERAL
+router.get('/ranking', async (req, res) => {
   try {
     const resultado = await controllerRanking.listarRanking()
-    return response.status(resultado.status_code).json(resultado)
+    return res.status(resultado.status_code).json(resultado)
   } catch (error) {
     console.error('GET /ranking:', error)
-    return response.status(500).json({
+
+    return res.status(500).json({
       status_code: 500,
       status: false,
-      message: 'Erro interno ao consultar o ranking.',
+      message: 'Erro interno ao consultar ranking.',
       response: {}
     })
   }
 })
 
-router.put('/ranking/:id', express.json(), async (request, response) => {
+// RANKING DA INSTITUIÇÃO
+router.get('/ranking/instituicao/:id', async (req, res) => {
   try {
-    const resultado = await controllerRanking.atualizarRanking(
-      request.body,
-      request.params.id,
-      request.headers['content-type']
+    const resultado = await controllerRanking.listarRankingInstituicao(
+      req.params.id
     )
-    return response.status(resultado.status_code).json(resultado)
+
+    return res.status(resultado.status_code).json(resultado)
   } catch (error) {
-    console.error('PUT /ranking/:id:', error)
-    return response.status(500).json({
+    console.error('GET /ranking/instituicao:', error)
+
+    return res.status(500).json({
       status_code: 500,
       status: false,
-      message: 'Erro interno ao atualizar o ranking.',
+      message: 'Erro interno ao consultar ranking da instituição.',
+      response: {}
+    })
+  }
+})
+
+// RANKING DO GRUPO
+router.get('/ranking/grupo/:id', async (req, res) => {
+  try {
+    const resultado = await controllerRanking.listarRankingGrupo(
+      req.params.id
+    )
+
+    return res.status(resultado.status_code).json(resultado)
+  } catch (error) {
+    console.error('GET /ranking/grupo:', error)
+
+    return res.status(500).json({
+      status_code: 500,
+      status: false,
+      message: 'Erro interno ao consultar ranking do grupo.',
+      response: {}
+    })
+  }
+})
+
+// ALTERAR VISIBILIDADE NO RANKING
+router.put('/ranking/:id', express.json(), async (req, res) => {
+  try {
+    const resultado = await controllerRanking.atualizarRanking(
+      req.body,
+      req.params.id,
+      req.headers['content-type']
+    )
+
+    return res.status(resultado.status_code).json(resultado)
+  } catch (error) {
+    console.error('PUT /ranking:', error)
+
+    return res.status(500).json({
+      status_code: 500,
+      status: false,
+      message: 'Erro interno ao atualizar ranking.',
       response: {}
     })
   }

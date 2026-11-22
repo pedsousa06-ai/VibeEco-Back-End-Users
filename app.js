@@ -58,7 +58,7 @@ const postCurtidaRouter = require("./routes/post_curtida/routes.js")
 app.use(API_BASE, postCurtidaRouter)
 
 // RANKING
-const rankingRouter = require("./routes/ranking/routes.js")
+const rankingRouter = require('./routes/ranking/routes.js')
 app.use(API_BASE, rankingRouter)
 
 // TELA INICIAL
