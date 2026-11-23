@@ -33,7 +33,7 @@ const selectAllMissao = async function (id_usuario) {
         // Verificar missões
         const dados = await knexConex.raw(`
             SELECT id, nome, id_dificuldade
-            FROM db_vibeeco_2026.tbl_missao
+            FROM db_vibeEco_2026.tbl_missao
             ORDER BY id
         `)
 
@@ -41,12 +41,12 @@ const selectAllMissao = async function (id_usuario) {
             SELECT
                 COUNT(*) AS total_missoes,
                 MAX(id) AS maior_id
-            FROM db_vibeeco_2026.tbl_missao
+            FROM db_vibeEco_2026.tbl_missao
         `)
 
         const testeMissao4 = await knexConex.raw(`
     SELECT id, nome
-    FROM db_vibeeco_2026.tbl_missao
+    FROM db_vibeEco_2026.tbl_missao
     WHERE id = 4
 `)
 
@@ -89,10 +89,10 @@ console.log('============================================')
                 um.id_usuario AS id_usuario,
                 um.status AS status_missao,
                 COALESCE(um.progresso, 0) AS progresso_missao
-            FROM db_vibeeco_2026.tbl_missao m
-            INNER JOIN db_vibeeco_2026.tbl_dificuldade d
+            FROM db_vibeEco_2026.tbl_missao m
+            INNER JOIN db_vibeEco_2026.tbl_dificuldade d
                 ON d.id = m.id_dificuldade
-            LEFT JOIN db_vibeeco_2026.tbl_usuario_missao um
+            LEFT JOIN db_vibeEco_2026.tbl_usuario_missao um
                 ON um.id_missao = m.id
                 AND um.id_usuario = ?
             ORDER BY m.data_termino DESC
@@ -134,10 +134,10 @@ const selectAllMissaoDisponivel = async function (id_usuario) {
                 um.id_usuario AS id_usuario,
                 um.status AS status_missao,
                 COALESCE(um.progresso, 0) AS progresso_missao
-            FROM db_vibeeco_2026.tbl_missao m
-            INNER JOIN db_vibeeco_2026.tbl_dificuldade d
+            FROM db_vibeEco_2026.tbl_missao m
+            INNER JOIN db_vibeEco_2026.tbl_dificuldade d
                 ON d.id = m.id_dificuldade
-            LEFT JOIN db_vibeeco_2026.tbl_usuario_missao um
+            LEFT JOIN db_vibeEco_2026.tbl_usuario_missao um
                 ON um.id_missao = m.id
                 AND um.id_usuario = ?
             WHERE m.data_termino >= CURDATE()
@@ -177,10 +177,10 @@ const selectAllMissaoAndamento = async function (id_usuario) {
                 um.id_usuario AS id_usuario,
                 um.status AS status_missao,
                 COALESCE(um.progresso, 0) AS progresso_missao
-            FROM db_vibeeco_2026.tbl_missao m
-            INNER JOIN db_vibeeco_2026.tbl_usuario_missao um
+            FROM db_vibeEco_2026.tbl_missao m
+            INNER JOIN db_vibeEco_2026.tbl_usuario_missao um
                 ON um.id_missao = m.id
-            INNER JOIN db_vibeeco_2026.tbl_dificuldade d
+            INNER JOIN db_vibeEco_2026.tbl_dificuldade d
                 ON d.id = m.id_dificuldade
             WHERE um.id_usuario = ?
               AND um.status = 'EM_ANDAMENTO'
@@ -216,10 +216,10 @@ const selectAllMissaoConcluida = async function (id_usuario) {
                 um.id_usuario AS id_usuario,
                 um.status AS status_missao,
                 COALESCE(um.progresso, 0) AS progresso_missao
-            FROM db_vibeeco_2026.tbl_missao m
-            INNER JOIN db_vibeeco_2026.tbl_usuario_missao um
+            FROM db_vibeEco_2026.tbl_missao m
+            INNER JOIN db_vibeEco_2026.tbl_usuario_missao um
                 ON um.id_missao = m.id
-            INNER JOIN db_vibeeco_2026.tbl_dificuldade d
+            INNER JOIN db_vibeEco_2026.tbl_dificuldade d
                 ON d.id = m.id_dificuldade
             WHERE um.id_usuario = ?
               AND um.status = 'CONCLUIDA'
