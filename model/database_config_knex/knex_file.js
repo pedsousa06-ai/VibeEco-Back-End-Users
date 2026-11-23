@@ -1,4 +1,7 @@
-try { require('dotenv').config() } catch { /* dotenv é opcional neste projeto */ }
+// Lê o arquivo .env (se existir): dotenv quando instalado, senão o leitor nativo do Node 20.12+
+try { require('dotenv').config() } catch {
+  try { if (typeof process.loadEnvFile === 'function') process.loadEnvFile() } catch { /* sem .env: usa os valores padrão abaixo */ }
+}
 
 module.exports = {
   development: {
