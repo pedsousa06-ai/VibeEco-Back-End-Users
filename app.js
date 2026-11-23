@@ -18,7 +18,7 @@ app.use(bodyParser.json())
 // Configuração do CORS
 const corsOption = {
     origin: "*",
-    methods: "GET, POST, PUT, DELETE, OPTIONS",
+    methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
     allowedHeaders: ["Content-Type", "Authorization"]
 }
 
@@ -111,7 +111,8 @@ app.use((err, req, res, next) => {
 })
 
 // INICIALIZAÇÃO DA API
-app.listen(8080, function() {
+const PORT = process.env.PORT || 8080
+app.listen(PORT, function() {
     console.log("API funcionando e aguardando requisições...")
-    console.log(`Endereço: http://localhost:8080${API_BASE}`)
+    console.log(`Endereço: http://localhost:${PORT}${API_BASE}`)
 })
