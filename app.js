@@ -4,6 +4,11 @@
  * Versão: 1.0.10.26
  ***************************************************************/
 
+// Carrega o .env antes de tudo (PORT, DB_*). O knex_file.js faz o mesmo para o banco.
+try { require('dotenv').config() } catch {
+    try { if (typeof process.loadEnvFile === 'function') process.loadEnvFile() } catch { /* sem .env: usa os padrões */ }
+}
+
 // IMPORTAÇÃO DAS DEPENDÊNCIAS
 const express = require("express")
 const cors = require("cors")

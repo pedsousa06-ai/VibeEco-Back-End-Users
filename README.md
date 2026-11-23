@@ -182,3 +182,15 @@ Este projeto foi desenvolvido pela equipe TechProton como parte do projeto VibeE
 | **Categoria** | Tecnologia • Sustentabilidade • Educação |
 | **Status** | Em desenvolvimento |
 | **Início** | 10/08/2026 |
+
+## ▶️ Como rodar
+
+```bash
+npm install
+cp .env.example .env     # ajuste DB_USER / DB_PASSWORD / DB_NAME ao seu MySQL
+npm start                # ou: npm run dev (reinicia a cada alteração)
+```
+
+A API sobe em `http://localhost:8080/v1/senai/vibeEco` (porta definida por `PORT` no `.env`).
+Se o back do adm estiver ligado ao mesmo tempo, mude o `PORT` de um dos dois.
+Antes, rode no MySQL: `Creates.sql`, `Inserts.sql`, `SelectsUSER.sql` e `migracao_perfil.sql` (repositório VibeEco-DataBase).
