@@ -50,6 +50,12 @@ app.use((req, res, next) => {
 // ROTA BASE DA API
 const API_BASE = "/v1/senai/vibeEco"
 
+// AUTENTICAÇÃO (JWT): middleware antes de todas as rotas + rotas públicas /auth/*
+const { protegerApi } = require("./middleware/autenticacao.js")
+app.use(API_BASE, protegerApi)
+const autenticacaoRouter = require("./routes/autenticacao/routes.js")
+app.use(API_BASE, autenticacaoRouter)
+
 // POST
 const postRouter = require("./routes/post/routes.js")
 app.use(API_BASE, postRouter)
