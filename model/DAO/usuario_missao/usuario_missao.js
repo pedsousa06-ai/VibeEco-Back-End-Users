@@ -26,34 +26,6 @@ const insertUsuarioMissao = async function (usuario_missao) {
     }
 }
 
-// Concluir missão
-const updateUsuarioMissao = async function (usuario_missao) {
-    try {
-        const sql = `
-            UPDATE tbl_usuario_missao
-            SET
-                status = 'CONCLUIDA',
-                progresso = 100,
-                data_conclusao = NOW()
-            WHERE
-                id_usuario = ?
-                AND id_missao = ?
-                AND status = 'EM_ANDAMENTO'
-        `
-
-        const result = await knexConex.raw(sql, [
-            usuario_missao.id_usuario,
-            usuario_missao.id_missao
-        ])
-
-        return result[0].affectedRows > 0
-
-    } catch (error) {
-        console.log('Erro ao concluir missão:', error)
-        return false
-    }
-}
-
 // Buscar participações pelo ID da missão
 const selectUsuarioMissaoByIdMissao = async function (id_missao) {
     try {
@@ -150,7 +122,6 @@ const deleteUsuarioMissao = async function (id) {
 
 module.exports = {
     insertUsuarioMissao,
-    updateUsuarioMissao,
     selectByIdUsuarioMissao,
     selectUsuarioMissaoByIdMissao,
     selectUsuarioMissaoByIdUsuario,

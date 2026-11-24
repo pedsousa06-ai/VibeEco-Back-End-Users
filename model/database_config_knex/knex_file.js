@@ -9,7 +9,7 @@ module.exports = {
     connection: {
       host: process.env.DB_HOST || 'localhost',
       user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASSWORD || '12345678',
+      password: process.env.DB_PASSWORD || 'bcd127',
       database: process.env.DB_NAME || 'db_vibeEco_2026',
       port: Number(process.env.DB_PORT) || 3306,
       charset: 'utf8mb4_0900_ai_ci',

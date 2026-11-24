@@ -106,7 +106,6 @@ app.use(API_BASE, historicoRouter)
 
 // NOTIFICAÇÕES
 const notificacaoRouter = require("./routes/notificacao/routes.js")
-console.log("Router de notificações:", typeof notificacaoRouter)
 app.use(API_BASE, notificacaoRouter)
 
 // CONTEÚDOS EDUCATIVOS
@@ -122,7 +121,7 @@ app.use((err, req, res, next) => {
 })
 
 // INICIALIZAÇÃO DA API
-const PORT = process.env.PORT || 4040
+const PORT = process.env.PORT || 8080
 app.listen(PORT, function() {
     console.log("API funcionando e aguardando requisições...")
     console.log(`Endereço: http://localhost:${PORT}${API_BASE}`)
