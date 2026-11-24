@@ -20,7 +20,7 @@ const enviarResposta = function (res, result) {
 }
 
 // Participar de uma missão
-router.post('/usuario_missao', async function (req, res) {
+router.post('/usuarioMissao', async function (req, res) {
     try {
         const contentType = req.headers['content-type']
         const dados = req.body
@@ -40,6 +40,34 @@ router.post('/usuario_missao', async function (req, res) {
             message: 'Erro interno ao participar da missão.'
         })
     }
+})
+
+router.get('/usuarioMissaoIdMissao/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controller.buscarUsuarioMissao(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+router.get('/usuarioMissaoIdMissao/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controller.buscarUsuarioMissaoIdMissao(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+router.get('/usuarioMissaoIdUsuario/:id', async function(request, response){
+    let id = request.params.id
+    let result = await controller.buscarUsuarioMissaoIdUsuario(id)
+    response.status(result.status_code)
+    response.json(result)
+})
+
+router.get('/usuario/idUsuario/missao/id', async function(request, response){
+    let id = request.params.id
+    let result = await controller.buscarUsuarioMissaoIdUsuarioIdMissao(id)
+    response.status(result.status_code)
+    response.json(result)
 })
 
 // Concluir uma missão

@@ -122,7 +122,7 @@ app.use((err, req, res, next) => {
 })
 
 // INICIALIZAÇÃO DA API
-const PORT = process.env.PORT || 8080
+const PORT = process.env.PORT || 4040
 app.listen(PORT, function() {
     console.log("API funcionando e aguardando requisições...")
     console.log(`Endereço: http://localhost:${PORT}${API_BASE}`)
