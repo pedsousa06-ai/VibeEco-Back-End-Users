@@ -9,13 +9,13 @@ const insertUsuarioConteudoEducativo = async function (usuario_conteudo_educativ
     try {
         const sql = `
             INSERT INTO tbl_usuario_conteudo_educativo
-                (id_usuario, id_missao, status, progresso)
-            VALUES (?, ?, 'EM_ANDAMENTO', 0)
+                (id_usuario, id_conteudo_educativo, concluido, data_acesso, tempo_acesso)
+            VALUES (?, ?, 0, now(), 0)
         `
 
         const result = await knexConex.raw(sql, [
             usuario_conteudo_educativo.id_usuario,
-            usuario_conteudo_educativo.id_missao
+            usuario_conteudo_educativo.id_conteudo_educativo
         ])
 
         return result[0].insertId || false
