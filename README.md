@@ -194,3 +194,22 @@ npm start                # ou: npm run dev (reinicia a cada alteração)
 A API sobe em `http://localhost:8080/v1/senai/vibeEco` (porta definida por `PORT` no `.env`).
 Se o back do adm estiver ligado ao mesmo tempo, mude o `PORT` de um dos dois.
 Antes, rode no MySQL: `Creates.sql`, `Inserts.sql`, `SelectsUSER.sql` e `migracao_perfil.sql` (repositório VibeEco-DataBase).
+
+## 🔐 Autenticação (JWT)
+
+Rotas públicas (`/v1/senai/vibeEco/auth/...`):
+
+| Método | Rota | Corpo | Resposta |
+|---|---|---|---|
+| POST | `/auth/login` | `{ login, senha }` (login = e-mail ou matrícula) | `{ response: { token, expira_em, usuario } }` |
+| GET | `/auth/me` | — (cabeçalho `Authorization: Bearer <token>`) | `{ response: { usuario } }` |
+| POST | `/auth/recuperarAcesso` | `{ email }` | sempre 200; envia código de 6 dígitos (15 min) |
+| POST | `/auth/validarCodigo` | `{ email, codigo }` | `{ response: { token } }` (token curto de redefinição) |
+| POST | `/auth/redefinirSenha` | `{ token, novaSenha }` | 200 |
+| POST | `/auth/primeiroAcesso` | `{ login, senhaAtual, novaSenha }` | 200 |
+
+- Senha nova: 8+ caracteres com letras e números. Senhas antigas em texto puro viram hash no primeiro login.
+- 5 falhas seguidas bloqueiam o login/código por 15 minutos (429).
+- Demais rotas aceitam `Authorization: Bearer <token>`. Token inválido → 401. Sem token: segue aberto, a não ser que `AUTH_OBRIGATORIA=true` no `.env`.
+- Sem `EMAIL_USER`/`EMAIL_PASSWORD` no `.env`, o código de recuperação aparece no console da API (use `EXPOR_CODIGO_DEV=true` para ele vir também na resposta, só em desenvolvimento).
+- Rode `npm install` (inclui o `nodemailer`) e a migração `migracao_auth_usuario.sql` no banco.
