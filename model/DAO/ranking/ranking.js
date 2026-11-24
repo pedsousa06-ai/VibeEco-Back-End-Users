@@ -34,7 +34,7 @@ function selecionarDadosUsuario(query, alias = 'u') {
 // RANKING GERAL
 async function selectAllRanking() {
   try {
-    return await knexConex('vwranking as r')
+    return await knexConex('vwRanking as r')
       .leftJoin(conquistasPorUsuario(), 'c.id_usuario', 'r.id')
       .select(
         'r.id',
