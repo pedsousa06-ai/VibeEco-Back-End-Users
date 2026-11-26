@@ -37,7 +37,7 @@ const inserirUsuarioEtapa = async function(usuarioEtapa, contentType) {
     let message = JSON.parse(JSON.stringify(config_message))
     try {
         //validando content type
-        if(String(contentType).toUpperCase() == "APPLICATION/JSON"){
+        if(String(contentType).toUpperCase().includes('APPLICATION/JSON')){
             //Valida o formato dos dados (400)
             let validar = await validarDados(usuarioEtapa)
             if(validar)

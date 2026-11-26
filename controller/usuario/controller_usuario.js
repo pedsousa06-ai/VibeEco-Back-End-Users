@@ -16,7 +16,7 @@ const adicionarXpCoinsUsuario = async function (usuario, id, contentType) {
     //Criando um clone do objeto JSON para manipular sua estrutura sem modificar o arquivo original
     let message = JSON.parse(JSON.stringify(config_message))
     try {
-            if(String(contentType).toUpperCase() == "APPLICATION/JSON"){
+            if(String(contentType).toUpperCase().includes('APPLICATION/JSON')){
                 let resultBuscarID = await buscarUsuario(id)
                 if(resultBuscarID.status){
                     //Validação de campos obrigatórios para atualização (body)

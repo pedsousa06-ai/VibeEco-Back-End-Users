@@ -18,7 +18,7 @@ const inserirPostCurtida = async function(postCurtida, contentType) {
     let message = JSON.parse(JSON.stringify(config_message))
     try {
         //validando content type
-        if(String(contentType).toUpperCase() == "APPLICATION/JSON"){
+        if(String(contentType).toUpperCase().includes('APPLICATION/JSON')){
             let validar = await validarDados(postCurtida)
             if(validar)
                 return validar //400
@@ -139,7 +139,7 @@ const excluirPostCurtidaByIDPostIdUsuario = async function (postCurtida, content
     let message = JSON.parse(JSON.stringify(config_message))
     try {
         //validando content type
-        if(String(contentType).toUpperCase() == "APPLICATION/JSON"){
+        if(String(contentType).toUpperCase().includes('APPLICATION/JSON')){
             let validar = await validarDados(postCurtida)
             if (validar)
                 return validar //400
