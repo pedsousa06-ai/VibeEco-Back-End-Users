@@ -45,8 +45,10 @@ const selectMissoesAndamentoByIdUsuario = async function(id){
                 m.nome AS nome_missao,
                 m.descricao AS descricao_missao,
                 m.total_xp_missao AS xp_missao,
+                m.total_xp_missao AS qtde_xp,
                 um.status AS status_missao,
                 um.progresso AS progresso_missao,
+                um.progresso AS progresso,
                 DATEDIFF(m.data_termino, CURDATE()) AS prazo_dias,
                 d.nome AS nome_dificuldade
             FROM tbl_usuario_missao um
@@ -68,22 +70,49 @@ const selectMissoesAndamentoByIdUsuario = async function(id){
     }
 }
 
-//retorna todos os conteudos recomendados
+//retorna os conteudos recomendados: os que o usuario ainda nao concluiu (inclui os que ele nunca abriu)
 const selectConteudosRecomendadosByIdUsuario = async function(id){
 
     try {
-
-        //enviando para o banco de dados
-        let result = await knexConex.raw('call procListarConteudoEducativoUsuario(?)', [id])
-        //Verificando se é um array
+        let sql = `
+            SELECT
+                c.id AS id,
+                ? AS id_usuario,
+                c.id AS id_conteudo_educativo,
+                c.nome AS nome_conteudo_educativo,
+                c.nome AS nome_conteudo,
+                c.qtde_xp AS xp_conteudo_educativo,
+                c.qtde_xp AS qtde_xp,
+                c.duracao_leitura AS duracao_leitura,
+                c.img AS img,
+                COALESCE((
+                    SELECT cat.nome
+                    FROM tbl_conteudo_educativo_categoria cc
+                    INNER JOIN tbl_categoria cat ON cat.id = cc.id_categoria
+                    WHERE cc.id_conteudo_educativo = c.id
+                    ORDER BY cat.id
+                    LIMIT 1
+                ), 'Geral') AS categoria,
+                0 AS status,
+                0 AS concluido
+            FROM tbl_conteudo_educativo c
+            WHERE NOT EXISTS (
+                SELECT 1 FROM tbl_usuario_conteudo_educativo uc
+                WHERE uc.id_conteudo_educativo = c.id
+                  AND uc.id_usuario = ?
+                  AND uc.concluido = 1
+            )
+            ORDER BY c.id DESC
+            LIMIT 10
+        `
+        let result = await knexConex.raw(sql, [id, id])
         if(Array.isArray(result)){
-
-            return result[0][0]
+            return result[0]
         }else{
             return false
         }
     } catch (error) {
-        //console.log(error)
+        console.log(error)
         return false
     }
 }
@@ -159,4 +188,4 @@ module.exports = {
     selectOfensivaByIdUsuario,
     selectDesafiosDestaque,
     selectConquistasByIdUsuario
-}
+}
