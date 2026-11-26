@@ -19,7 +19,7 @@ const inserirUsuarioDesafio = async function(usuarioDesafio, contentType) {
     let message = JSON.parse(JSON.stringify(config_message))
     try {
         //validando content type
-        if(String(contentType).toUpperCase() == "APPLICATION/JSON"){
+        if(String(contentType).toUpperCase().includes('APPLICATION/JSON')){
             let validar = await validarDados(usuarioDesafio)
             if(validar)
                 return validar //400
@@ -65,7 +65,7 @@ const atualizarUsuarioDesafio = async function (usuarioDesafio, id, contentType)
     let message = JSON.parse(JSON.stringify(config_message))
     try {
         //Validação do contentType para receber apenas JSON
-        if(String(contentType).toUpperCase() == 'APPLICATION/JSON'){
+        if(String(contentType).toUpperCase().includes('APPLICATION/JSON')){
             if(!idValido(id)){
                 message.ERROR_BAD_REQUEST.field = '[ID] INVÁLIDO' //400
                 return message.ERROR_BAD_REQUEST
